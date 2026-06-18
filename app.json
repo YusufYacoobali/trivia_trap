@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "Trivia Trap",
+    "slug": "trivia-trap",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "triviatrap",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#faf7ff",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.triviatrap.app",
+      "infoPlist": {
+        "UIBackgroundModes": [],
+        "UIStatusBarHidden": true,
+        "UIViewControllerBasedStatusBarAppearance": false
+      }
+    },
+    "androidStatusBar": {
+      "hidden": true
+    },
+    "android": {
+      "package": "com.triviatrap.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#ff4d6d"
+      },
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "SCHEDULE_EXACT_ALARM"
+      ]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#ff4d6d"
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}

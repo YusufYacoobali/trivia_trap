@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  *::-webkit-scrollbar{width:0;height:0;display:none}
+  html,body{margin:0;padding:0;font-family:'Fredoka',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{background:radial-gradient(120% 120% at 50% 0%,#efeafc 0%,#e4def5 60%,#ddd6f0 100%);min-height:100vh;display:flex;align-items:center;justify-content:center}
+  @keyframes tt-pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.07)}100%{transform:scale(1);opacity:1}}
+  @keyframes tt-slideup{from{transform:translateY(102%)}to{transform:translateY(0)}}
+  @keyframes tt-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
+  @keyframes tt-confetti{to{transform:translateY(560px) rotate(560deg);opacity:0}}
+  @keyframes tt-burst{0%{transform:scale(0);opacity:.55}100%{transform:scale(2.6);opacity:0}}
+  @keyframes tt-count{0%{transform:scale(.3);opacity:0}55%{transform:scale(1.28)}100%{transform:scale(1)}}
+  @keyframes tt-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes tt-flash{from{opacity:.45}to{opacity:0}}
+  @keyframes tt-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+
+<div style="width:430px;height:880px;background:#1d1830;border-radius:54px;padding:13px;box-shadow:0 40px 90px -20px rgba(60,40,120,.55),0 0 0 2px rgba(255,255,255,.06) inset;position:relative">
+  <div style="position:absolute;left:50%;top:26px;transform:translateX(-50%);width:120px;height:30px;background:#1d1830;border-radius:0 0 18px 18px;z-index:60"></div>
+
+  <div style="width:100%;height:100%;background:{{ appBg }};border-radius:42px;overflow:hidden;position:relative;display:flex;flex-direction:column">
+
+    <!-- status bar -->
+    <div style="height:48px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 7px;font-size:15px;font-weight:600;color:{{ statusColor }};z-index:50">
+      <span>9:41</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="display:flex;gap:2px;align-items:flex-end">
+          <i style="width:3px;height:7px;background:currentColor;border-radius:1px;display:block;opacity:.5"></i>
+          <i style="width:3px;height:10px;background:currentColor;border-radius:1px;display:block;opacity:.7"></i>
+          <i style="width:3px;height:13px;background:currentColor;border-radius:1px;display:block"></i>
+        </span>
+        <span style="width:22px;height:12px;border:1.5px solid currentColor;border-radius:3px;position:relative;display:inline-block">
+          <i style="position:absolute;inset:1.5px;width:70%;background:currentColor;border-radius:1px;display:block"></i>
+        </span>
+      </div>
+    </div>
+
+    <!-- scroll content -->
+    <div style="flex:1;overflow-y:auto;position:relative">
+
+      <!-- ===================== HOME ===================== -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:6px 20px 120px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+          <div style="font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1">
+            <span style="color:#2a2540">Trivia</span><span style="color:#ff4d6d"> Trap</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="display:flex;align-items:center;gap:6px;background:#fff;border:2px solid #ffe2c2;color:#e8890b;font-weight:600;font-size:14px;padding:6px 11px 6px 8px;border-radius:14px">
+              <span style="width:18px;height:18px;border-radius:50%;background:linear-gradient(160deg,#ffd166,#ffb703);display:inline-block"></span>{{ coins }}
+            </div>
+            <div onClick="{{ goProfile }}" style="width:40px;height:40px;border-radius:14px;background:linear-gradient(160deg,#ff7a93,#ff4d6d);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;cursor:pointer;box-shadow:0 4px 0 #d63659">Y</div>
+          </div>
+        </div>
+
+        <!-- Daily hero -->
+        <div onClick="{{ playDaily }}" style="position:relative;border-radius:28px;padding:22px 22px 20px;margin-bottom:22px;background:linear-gradient(140deg,#ff5d7d 0%,#ff4d6d 45%,#9b5cff 130%);box-shadow:0 12px 0 -2px #c83a5c,0 22px 30px -14px rgba(255,77,109,.7);cursor:pointer;overflow:hidden">
+          <div style="position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.13)"></div>
+          <div style="position:absolute;right:24px;bottom:-34px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.1)"></div>
+          <div style="position:relative">
+            <div style="display:inline-block;background:rgba(255,255,255,.22);color:#fff;font-size:12px;font-weight:600;padding:4px 11px;border-radius:20px;letter-spacing:.3px;text-transform:uppercase">Daily Challenge</div>
+            <div style="color:#fff;font-size:34px;font-weight:700;line-height:1.05;margin:11px 0 3px">Daily 10</div>
+            <div style="color:rgba(255,255,255,.88);font-size:14px;margin-bottom:16px">10 mixed questions · keep your streak alive</div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="background:#fff;color:#ff4d6d;font-weight:700;font-size:16px;padding:11px 26px;border-radius:18px;box-shadow:0 5px 0 rgba(0,0,0,.12)">Play ▶</div>
+              <div style="display:flex;gap:5px">
+                <i style="width:9px;height:9px;border-radius:50%;background:#fff;display:block"></i>
+                <i style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.45);display:block"></i>
+                <i style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.45);display:block"></i>
+                <i style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);display:block"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin:0 4px 13px">
+          <div style="font-size:20px;font-weight:700;color:#2a2540">Game Modes</div>
+          <div style="font-size:13px;color:#9890ad;font-weight:500">7 modes</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+          <div onClick="{{ playClassic }}" style="position:relative;overflow:hidden;background:linear-gradient(150deg,#ff89a3,#ff4d6d);border-radius:24px;padding:16px;cursor:pointer;box-shadow:0 6px 0 #d63659,0 14px 22px -12px rgba(255,77,109,.85)">
+            <div style="position:absolute;right:-20px;top:-20px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.16)"></div>
+            <div style="position:absolute;right:14px;bottom:10px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12)"></div>
+            <div style="position:relative;width:48px;height:48px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 3px 0 rgba(0,0,0,.08)">
+              <svg width="27" height="27" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#ff4d6d"/><path d="M9.1 9.3a2.9 2.9 0 0 1 5.7 1c0 1.9-2.6 2-2.6 3.8" stroke="#fff" stroke-width="2.1" stroke-linecap="round"/><circle cx="12.1" cy="16.5" r="1.25" fill="#fff"/></svg>
+            </div>
+            <div style="position:relative;font-size:16px;font-weight:600;color:#fff;line-height:1.1">Classic Trivia</div>
+            <div style="position:relative;font-size:12px;color:rgba(255,255,255,.82);margin-top:3px">7 categories</div>
+          </div>
+          <div onClick="{{ playTruthlie }}" style="position:relative;overflow:hidden;background:linear-gradient(150deg,#4fcef5,#1ba0cf);border-radius:24px;padding:16px;cursor:pointer;box-shadow:0 6px 0 #1583a8,0 14px 22px -12px rgba(27,160,207,.85)">
+            <div style="position:absolute;right:-20px;top:-20px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.16)"></div>
+            <div style="position:absolute;right:14px;bottom:10px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12)"></div>
+            <div style="position:relative;width:60px;height:48px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 3px 0 rgba(0,0,0,.08)">
+              <svg width="46" height="26" viewBox="0 0 32 24" fill="none"><circle cx="9" cy="12" r="8" fill="#19c37d"/><path d="M5.6 12.3 8 14.7l4-4.7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="12" r="8" fill="#ff4d6d"/><path d="M20.2 9.2 25.8 14.8M25.8 9.2 20.2 14.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </div>
+            <div style="position:relative;font-size:16px;font-weight:600;color:#fff;line-height:1.1">Truth or Lie</div>
+            <div style="position:relative;font-size:12px;color:rgba(255,255,255,.82);margin-top:3px">Spot the truth</div>
+          </div>
+          <div onClick="{{ playTrap }}" style="position:relative;overflow:hidden;background:linear-gradient(150deg,#ffc15c,#f59008);border-radius:24px;padding:16px;cursor:pointer;box-shadow:0 6px 0 #c2730a,0 14px 22px -12px rgba(245,144,8,.85)">
+            <div style="position:absolute;right:-20px;top:-20px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.16)"></div>
+            <div style="position:absolute;right:14px;bottom:10px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12)"></div>
+            <div style="position:relative;width:48px;height:48px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 3px 0 rgba(0,0,0,.08)">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.2 22 20.2H2L12 3.2Z" fill="#f59008"/><path d="M12 9.6v4.3" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.25" fill="#fff"/></svg>
+            </div>
+            <div style="position:relative;font-size:16px;font-weight:600;color:#fff;line-height:1.1">Trap Questions</div>
+            <div style="position:relative;font-size:12px;color:rgba(255,255,255,.82);margin-top:3px">Don't assume</div>
+          </div>
+          <div onClick="{{ playBeatcrowd }}" style="position:relative;overflow:hidden;background:linear-gradient(150deg,#3ee08f,#0fa066);border-radius:24px;padding:16px;cursor:pointer;box-shadow:0 6px 0 #0c8052,0 14px 22px -12px rgba(15,160,102,.85)">
+            <div style="position:absolute;right:-20px;top:-20px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.16)"></div>
+            <div style="position:absolute;right:14px;bottom:10px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12)"></div>
+            <div style="position:relative;width:48px;height:48px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 3px 0 rgba(0,0,0,.08)">
+              <svg width="27" height="27" viewBox="0 0 24 24" fill="none"><rect x="3" y="13" width="4.6" height="8" rx="1.5" fill="#0fa066"/><rect x="9.7" y="8" width="4.6" height="13" rx="1.5" fill="#19c37d"/><rect x="16.4" y="4" width="4.6" height="17" rx="1.5" fill="#0fa066"/></svg>
+            </div>
+            <div style="position:relative;font-size:16px;font-weight:600;color:#fff;line-height:1.1">Beat the Crowd</div>
+            <div style="position:relative;font-size:12px;color:rgba(255,255,255,.82);margin-top:3px">Guess the %</div>
+          </div>
+          <div onClick="{{ playStreak }}" style="position:relative;overflow:hidden;background:linear-gradient(150deg,#a98bff,#7b5cff);border-radius:24px;padding:16px;cursor:pointer;box-shadow:0 6px 0 #5f3fe0,0 14px 22px -12px rgba(123,92,255,.85)">
+            <div style="position:absolute;right:-20px;top:-20px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.16)"></div>
+            <div style="position:absolute;right:14px;bottom:10px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12)"></div>
+            <div style="position:relative;width:48px;height:48px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 3px 0 rgba(0,0,0,.08)">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M13.2 2.2s1.5 3.6-1 6.6c-2.8 3.3-3.8 4.3-3.8 7.2a6 6 0 0 0 12 .3c.2-3-1.6-4.8-2.3-6.3-.7 1-1.6 1.4-2.3 1.1 1.1-3.1.1-6.6-2.6-8.9Z" fill="#7b5cff"/><path d="M13.4 12.8c1.4 1 2 2.1 1.9 3.3a2.35 2.35 0 0 1-4.7-.2c0-1 .5-1.7 1.2-2.5" fill="#ffb9cf"/></svg>
+            </div>
+            <div style="position:relative;font-size:16px;font-weight:600;color:#fff;line-height:1.1">Streak Run</div>
+            <div style="position:relative;font-size:12px;color:rgba(255,255,255,.82);margin-top:3px">One wrong = out</div>
+          </div>
+          <div onClick="{{ playRush }}" style="position:relative;overflow:hidden;background:linear-gradient(150deg,#2fe6c6,#12b39a);border-radius:24px;padding:16px;cursor:pointer;box-shadow:0 6px 0 #0d8f7c,0 14px 22px -12px rgba(18,179,154,.85)">
+            <div style="position:absolute;right:-20px;top:-20px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.16)"></div>
+            <div style="position:absolute;right:14px;bottom:10px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12)"></div>
+            <div style="position:relative;width:48px;height:48px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 3px 0 rgba(0,0,0,.08)">
+              <svg width="27" height="27" viewBox="0 0 24 24" fill="none"><rect x="9.5" y="2" width="5" height="2.6" rx="1.3" fill="#12b39a"/><circle cx="12" cy="14" r="8" fill="#12b39a"/><circle cx="12" cy="14" r="5.5" fill="#fff"/><path d="M12 14V10.4" stroke="#12b39a" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div style="position:relative;font-size:16px;font-weight:600;color:#fff;line-height:1.1">Category Rush</div>
+            <div style="position:relative;font-size:12px;color:rgba(255,255,255,.82);margin-top:3px">Beat the clock</div>
+          </div>
+        </div>
+
+        <div onClick="{{ playHard }}" style="margin-top:13px;background:linear-gradient(135deg,#2a2540,#3a2f56);border-radius:24px;padding:18px 20px;display:flex;align-items:center;gap:15px;cursor:pointer;box-shadow:0 6px 0 #15101f,0 14px 22px -12px rgba(42,37,64,.8);position:relative;overflow:hidden">
+          <div style="position:absolute;right:-10px;top:-24px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,183,3,.28),transparent 70%)"></div>
+          <div style="width:50px;height:50px;border-radius:15px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex:none">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M7 3.2h10l4 6-9 11.6L3 9.2l4-6Z" fill="#ffb703"/><path d="M3 9.2h18M9 3.2 7.2 9.2l4.8 11.6M15 3.2l1.8 6-4.8 11.6" stroke="#15101f" stroke-width="1.1" opacity=".22"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:17px;font-weight:600;color:#fff;line-height:1.1">Hard Mode</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Only the brutal ones · double rewards</div>
+          </div>
+          <div style="color:rgba(255,255,255,.45);font-size:22px">›</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== CATEGORY SELECT ===================== -->
+      <sc-if value="{{ isCategory }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:6px 20px 120px">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:22px">
+          <div onClick="{{ goHome }}" style="width:42px;height:42px;border-radius:14px;background:#fff;box-shadow:0 4px 0 #ece5f4;border:2px solid #f3eefa;display:flex;align-items:center;justify-content:center;font-size:20px;color:#2a2540;cursor:pointer">‹</div>
+          <div>
+            <div style="font-size:22px;font-weight:700;color:#2a2540;line-height:1">Pick a category</div>
+            <div style="font-size:13px;color:#9890ad">{{ modeName }}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+          <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="6">
+            <div onClick="{{ cat.onClick }}" style="{{ cat.style }}">
+              <div style="position:absolute;right:-18px;top:-18px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.16)"></div>
+              <div style="position:absolute;right:12px;bottom:10px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.12)"></div>
+              <div style="{{ cat.iconStyle }}">{{ cat.art }}</div>
+              <div style="position:relative;font-size:16px;font-weight:600;color:#fff;line-height:1.1">{{ cat.name }}</div>
+              <div style="position:relative;font-size:12px;color:rgba(255,255,255,.82);margin-top:3px">{{ cat.count }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== QUESTION ===================== -->
+      <sc-if value="{{ isQuestion }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:6px 20px 28px;min-height:100%;display:flex;flex-direction:column;position:relative">
+        <div style="position:absolute;left:-50px;top:40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,{{ accent }}26,transparent 70%);pointer-events:none"></div>
+        <div style="position:absolute;right:-44px;top:200px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,{{ accentSh }}22,transparent 70%);pointer-events:none"></div>
+        <!-- top bar -->
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:18px;position:relative">
+          <div onClick="{{ quit }}" style="width:40px;height:40px;border-radius:13px;background:#fff;box-shadow:0 4px 0 #ece5f4;border:2px solid #f3eefa;display:flex;align-items:center;justify-content:center;font-size:18px;color:#9890ad;cursor:pointer">✕</div>
+          <div style="flex:1;height:13px;background:#ece5f4;border-radius:10px;overflow:hidden">
+            <div style="height:100%;width:{{ progressPct }};background:linear-gradient(90deg,{{ accent }},{{ accentSh }});border-radius:10px;transition:width .4s cubic-bezier(.34,1.56,.64,1)"></div>
+          </div>
+          <div style="{{ counterStyle }}">{{ counterText }}</div>
+        </div>
+
+        <!-- score -->
+        <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:13px;position:relative">
+          <div style="display:flex;align-items:center;gap:6px;background:linear-gradient(150deg,{{ accent }},{{ accentSh }});color:#fff;font-size:15px;font-weight:700;padding:7px 15px 7px 13px;border-radius:20px;box-shadow:0 4px 0 {{ accentSh }}">
+            <span style="font-size:11px;font-weight:600;opacity:.85;letter-spacing:.5px">SCORE</span>{{ score }}
+          </div>
+        </div>
+
+        <!-- question -->
+        <div style="position:relative;background:#fff;border-radius:26px;padding:18px 22px 22px;box-shadow:0 7px 0 #ece5f4;border:2px solid #f3eefa;margin-bottom:18px;overflow:hidden">
+          <div style="position:absolute;right:-22px;top:-22px;width:80px;height:80px;border-radius:50%;background:{{ chipBg }};opacity:.6"></div>
+          <div style="position:relative;display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:52px;height:52px;border-radius:16px;background:{{ chipBg }};display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 3px 0 rgba(0,0,0,.05)">{{ qArt }}</div>
+            <div style="font-size:12px;font-weight:700;color:{{ accent }};text-transform:uppercase;letter-spacing:.7px">{{ catLabel }}</div>
+          </div>
+          <div style="position:relative;font-size:23px;font-weight:600;color:#2a2540;line-height:1.25;text-wrap:pretty">{{ qText }}</div>
+        </div>
+
+        <!-- hints -->
+        <sc-if value="{{ hintsOn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:9px;margin-bottom:16px">
+          <div onClick="{{ hintFifty }}" style="{{ hint5Style }}">
+            <span style="font-weight:700">50/50</span>
+            <span style="{{ hint5BadgeStyle }}">{{ hint5Count }}</span>
+          </div>
+          <div onClick="{{ hintCrowd }}" style="{{ hintCStyle }}">
+            <span style="font-weight:700">Crowd</span>
+            <span style="{{ hintCBadgeStyle }}">{{ hintCCount }}</span>
+          </div>
+          <div onClick="{{ hintSkip }}" style="{{ hintSStyle }}">
+            <span style="font-weight:700">Skip</span>
+            <span style="{{ hintSBadgeStyle }}">{{ hintSCount }}</span>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- options -->
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <sc-for list="{{ options }}" as="opt" hint-placeholder-count="4">
+            <button onClick="{{ opt.onClick }}" disabled="{{ opt.disabled }}" style="{{ opt.style }}">
+              <span style="{{ opt.labelStyle }}">{{ opt.label }}</span>
+              <span style="flex:1;text-align:left;line-height:1.2">{{ opt.text }}</span>
+              <span style="{{ opt.distStyle }}">{{ opt.distText }}</span>
+              <span style="{{ opt.markStyle }}">{{ opt.mark }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      </sc-if>
+
+      <!-- ===================== SUMMARY ===================== -->
+      <sc-if value="{{ isSummary }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:24px 22px 40px;min-height:100%;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden;background:linear-gradient(172deg,#ffe1ec 0%,#ffeede 22%,#ece4ff 52%,#dcf0ff 78%,#e2fbef 100%)">
+        <div style="position:absolute;top:-60px;left:-66px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#ff8fb3,transparent 66%);opacity:.55;pointer-events:none"></div>
+        <div style="position:absolute;top:78px;right:-80px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#79c6ff,transparent 66%);opacity:.5;pointer-events:none"></div>
+        <div style="position:absolute;bottom:-40px;left:-56px;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,#ffd06b,transparent 66%);opacity:.5;pointer-events:none"></div>
+        <div style="position:absolute;bottom:140px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,#86e7bd,transparent 66%);opacity:.5;pointer-events:none"></div>
+        <div style="position:absolute;top:26px;left:30px;width:15px;height:15px;border-radius:50%;background:#ff4d6d;pointer-events:none"></div>
+        <div style="position:absolute;top:66px;right:36px;width:12px;height:12px;border-radius:4px;background:#ffb703;transform:rotate(22deg);pointer-events:none"></div>
+        <div style="position:absolute;top:150px;left:22px;width:11px;height:11px;border-radius:50%;background:#4cc9f0;pointer-events:none"></div>
+        <div style="position:absolute;top:120px;right:26px;width:13px;height:13px;border-radius:4px;background:#7b5cff;transform:rotate(-16deg);pointer-events:none"></div>
+        <div style="position:absolute;top:300px;left:30px;width:12px;height:12px;border-radius:50%;background:#19c37d;pointer-events:none"></div>
+        <div style="position:absolute;bottom:96px;left:40px;width:13px;height:13px;border-radius:4px;background:#ff7a93;transform:rotate(12deg);pointer-events:none"></div>
+        <div style="position:absolute;bottom:60px;right:34px;width:14px;height:14px;border-radius:50%;background:#ffb703;pointer-events:none"></div>
+        <div style="position:absolute;bottom:150px;right:48px;width:10px;height:10px;border-radius:50%;background:#7b5cff;pointer-events:none"></div>
+
+        <div style="position:relative;font-size:48px;line-height:1;margin-bottom:6px;animation:tt-pop .5s cubic-bezier(.34,1.7,.5,1)">{{ summaryEmoji }}</div>
+        <div style="position:relative;font-size:14px;font-weight:700;color:{{ accent }};letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;animation:tt-fade .4s ease">{{ summaryKicker }}</div>
+        <div style="position:relative;font-size:30px;font-weight:700;color:#2a2540;margin-bottom:20px;animation:tt-fade .5s ease">{{ summaryTitle }}</div>
+        <div style="position:relative;margin-bottom:24px;animation:tt-pop .6s cubic-bezier(.34,1.6,.5,1)">
+          <div style="position:absolute;inset:-14px;border-radius:50%;background:linear-gradient(140deg,{{ accent }},{{ accentSh }});opacity:.2;filter:blur(7px)"></div>
+          <div style="position:relative;width:152px;height:152px;border-radius:50%;background:linear-gradient(140deg,{{ accent }},{{ accentSh }});display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 14px 30px -8px {{ accentSh }},0 0 0 7px #fff,0 0 0 10px {{ chipBg }}">
+            <div style="font-size:13px;font-weight:600;opacity:.9;letter-spacing:.5px">POINTS</div>
+            <div style="font-size:54px;font-weight:700;line-height:1">{{ score }}</div>
+          </div>
+        </div>
+        <div style="position:relative;display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-bottom:20px">
+          <div style="position:relative;overflow:hidden;background:linear-gradient(150deg,#eafaf1,#d6f4e4);border-radius:20px;padding:16px;box-shadow:0 5px 0 #c0ecd2;border:2px solid #c0ecd2">
+            <div style="position:absolute;right:11px;top:13px;font-size:21px">🎯</div>
+            <div style="font-size:26px;font-weight:700;color:#0c9c63">{{ summaryCorrect }}</div>
+            <div style="font-size:13px;color:#3a9b73;font-weight:600">Correct</div>
+          </div>
+          <div style="position:relative;overflow:hidden;background:linear-gradient(150deg,#e8f7fe,#d1edfb);border-radius:20px;padding:16px;box-shadow:0 5px 0 #bce5f6;border:2px solid #bce5f6">
+            <div style="position:absolute;right:11px;top:13px;font-size:21px">📊</div>
+            <div style="font-size:26px;font-weight:700;color:#1389b6">{{ summaryAcc }}</div>
+            <div style="font-size:13px;color:#3f93b3;font-weight:600">Accuracy</div>
+          </div>
+          <div style="position:relative;overflow:hidden;background:linear-gradient(150deg,#f3eeff,#e4d8ff);border-radius:20px;padding:16px;box-shadow:0 5px 0 #d3c4ff;border:2px solid #d3c4ff">
+            <div style="position:absolute;right:11px;top:13px;font-size:21px">🔥</div>
+            <div style="font-size:26px;font-weight:700;color:#6a45e6">{{ summaryBest }}</div>
+            <div style="font-size:13px;color:#7a64ad;font-weight:600">Best streak</div>
+          </div>
+          <div style="position:relative;overflow:hidden;background:linear-gradient(150deg,#fff6e0,#ffecbd);border-radius:20px;padding:16px;box-shadow:0 5px 0 #ffdd9a;border:2px solid #ffdd9a">
+            <div style="position:absolute;right:11px;top:13px;font-size:21px">🪙</div>
+            <div style="font-size:26px;font-weight:700;color:#e8890b">+{{ summaryCoins }}</div>
+            <div style="font-size:13px;color:#b58026;font-weight:600">Coins earned</div>
+          </div>
+        </div>
+        <sc-if value="{{ hasNewBadges }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;width:100%;background:linear-gradient(150deg,#fff7e2,#ffeec0);border:2px solid #ffe09a;border-radius:20px;padding:15px;margin-bottom:20px;box-shadow:0 5px 0 #ffdd9a">
+          <div style="font-size:13px;font-weight:700;color:#e8890b;margin-bottom:10px">🆕 NEW BADGE UNLOCKED</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <sc-for list="{{ newBadges }}" as="b" hint-placeholder-count="1">
+              <div style="display:flex;align-items:center;gap:9px">
+                <div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(150deg,#ffd166,#ffb703);color:#fff;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ b.icon }}</div>
+                <div><div style="font-size:14px;font-weight:600;color:#2a2540">{{ b.name }}</div><div style="font-size:12px;color:#b08a3a">{{ b.desc }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+        <button onClick="{{ playAgain }}" style="width:100%;border:none;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,{{ accent }},{{ accentSh }});color:#fff;font-size:18px;font-weight:700;padding:16px;border-radius:20px;box-shadow:0 6px 0 {{ accentSh }};margin-bottom:11px;position:relative">Play Again ▶</button>
+        <button onClick="{{ goHome }}" style="width:100%;border:2px solid #ece5f4;cursor:pointer;font-family:inherit;background:#fff;color:#6b6584;font-size:16px;font-weight:600;padding:14px;border-radius:20px;position:relative">Back to Home</button>
+      </div>
+      </sc-if>
+
+      <!-- ===================== PROFILE ===================== -->
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:6px 20px 120px">
+        <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:22px">
+          <div style="width:78px;height:78px;border-radius:26px;background:linear-gradient(150deg,#ff7a93,#ff4d6d);display:flex;align-items:center;justify-content:center;color:#fff;font-size:34px;font-weight:700;box-shadow:0 7px 0 #d63659;margin-bottom:12px">Y</div>
+          <div style="font-size:23px;font-weight:700;color:#2a2540">You</div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:5px">
+            <span style="font-size:13px;font-weight:600;color:#e8890b;background:#fff6e0;padding:5px 12px;border-radius:14px">🔥 {{ dayStreak }} day streak</span>
+            <span style="font-size:13px;font-weight:600;color:#7b5cff;background:#f1ecff;padding:5px 12px;border-radius:14px">Level {{ level }}</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px">
+          <div style="background:#fff;border-radius:20px;padding:16px;box-shadow:0 4px 0 #ece5f4;border:2px solid #f3eefa"><div style="font-size:26px;font-weight:700;color:#2a2540">{{ totalScore }}</div><div style="font-size:13px;color:#9890ad;font-weight:500">Total points</div></div>
+          <div style="background:#fff;border-radius:20px;padding:16px;box-shadow:0 4px 0 #ece5f4;border:2px solid #f3eefa"><div style="font-size:26px;font-weight:700;color:#2a2540">{{ games }}</div><div style="font-size:13px;color:#9890ad;font-weight:500">Games played</div></div>
+          <div style="background:#fff;border-radius:20px;padding:16px;box-shadow:0 4px 0 #ece5f4;border:2px solid #f3eefa"><div style="font-size:26px;font-weight:700;color:#2a2540">{{ bestStreak }}</div><div style="font-size:13px;color:#9890ad;font-weight:500">Best streak</div></div>
+          <div style="background:#fff;border-radius:20px;padding:16px;box-shadow:0 4px 0 #ece5f4;border:2px solid #f3eefa"><div style="font-size:26px;font-weight:700;color:#2a2540">{{ lifetimeAcc }}</div><div style="font-size:13px;color:#9890ad;font-weight:500">Accuracy</div></div>
+        </div>
+
+        <div style="font-size:18px;font-weight:700;color:#2a2540;margin:0 2px 12px">Badges</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:24px">
+          <sc-for list="{{ badges }}" as="b" hint-placeholder-count="6">
+            <div style="{{ b.cardStyle }}">
+              <div style="{{ b.iconStyle }}">{{ b.icon }}</div>
+              <div style="font-size:12.5px;font-weight:600;color:#2a2540;line-height:1.1;text-align:center;margin-top:7px">{{ b.name }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-size:18px;font-weight:700;color:#2a2540;margin:0 2px 12px">Daily Leaderboard</div>
+        <div style="background:#fff;border-radius:22px;padding:8px;box-shadow:0 5px 0 #ece5f4;border:2px solid #f3eefa">
+          <sc-for list="{{ leaderboard }}" as="row" hint-placeholder-count="5">
+            <div style="{{ row.style }}">
+              <div style="{{ row.rankStyle }}">{{ row.rank }}</div>
+              <div style="flex:1;font-size:15px;font-weight:600;color:#2a2540">{{ row.name }}</div>
+              <div style="font-size:15px;font-weight:700;color:{{ row.scoreColor }}">{{ row.score }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== SETTINGS ===================== -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:6px 20px 120px">
+        <div style="font-size:26px;font-weight:700;color:#2a2540;margin-bottom:20px">Settings</div>
+
+        <div style="font-size:13px;font-weight:600;color:#9890ad;text-transform:uppercase;letter-spacing:.5px;margin:0 4px 9px">Preferences</div>
+        <div style="background:#fff;border-radius:22px;padding:4px 16px;box-shadow:0 5px 0 #ece5f4;border:2px solid #f3eefa;margin-bottom:22px">
+          <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="3">
+            <div style="{{ t.rowStyle }}">
+              <div style="flex:1"><div style="font-size:16px;font-weight:600;color:#2a2540">{{ t.name }}</div><div style="font-size:12.5px;color:#9890ad">{{ t.desc }}</div></div>
+              <div onClick="{{ t.onClick }}" style="{{ t.trackStyle }}"><div style="{{ t.knobStyle }}"></div></div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-size:13px;font-weight:600;color:#9890ad;text-transform:uppercase;letter-spacing:.5px;margin:0 4px 9px">Theme</div>
+        <div style="display:flex;gap:10px;margin-bottom:22px">
+          <sc-for list="{{ themes }}" as="th" hint-placeholder-count="3">
+            <div onClick="{{ th.onClick }}" style="{{ th.style }}">
+              <div style="display:flex;gap:4px;margin-bottom:8px">{{ th.swatches }}</div>
+              <div style="font-size:13px;font-weight:600;color:#2a2540">{{ th.name }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-size:13px;font-weight:600;color:#9890ad;text-transform:uppercase;letter-spacing:.5px;margin:0 4px 9px">Account</div>
+        <div style="background:#fff;border-radius:22px;padding:4px 16px;box-shadow:0 5px 0 #ece5f4;border:2px solid #f3eefa;margin-bottom:22px">
+          <div style="display:flex;align-items:center;padding:15px 0;border-bottom:1.5px solid #f3eefa"><div style="flex:1;font-size:16px;font-weight:600;color:#2a2540">Manage subscription</div><span style="color:#cbc4da;font-size:20px">›</span></div>
+          <div style="display:flex;align-items:center;padding:15px 0;border-bottom:1.5px solid #f3eefa"><div style="flex:1;font-size:16px;font-weight:600;color:#2a2540">Restore purchases</div><span style="color:#cbc4da;font-size:20px">›</span></div>
+          <div style="display:flex;align-items:center;padding:15px 0"><div style="flex:1;font-size:16px;font-weight:600;color:#2a2540">Help & support</div><span style="color:#cbc4da;font-size:20px">›</span></div>
+        </div>
+
+        <button onClick="{{ resetProgress }}" style="width:100%;border:2px solid #ffd9e0;cursor:pointer;font-family:inherit;background:#fff5f7;color:#ff4d6d;font-size:16px;font-weight:600;padding:14px;border-radius:20px">{{ resetLabel }}</button>
+        <div style="text-align:center;font-size:12px;color:#b8b2c8;margin-top:16px">Trivia Trap · v1.0.0</div>
+      </div>
+      </sc-if>
+
+    </div>
+
+
+    <!-- QUESTION OVERLAYS (pinned to screen) -->
+    <sc-if value="{{ isQuestion }}" hint-placeholder-val="{{ false }}">
+      <!-- dim + sheets -->
+      <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(28,20,48,.42);z-index:30;animation:tt-fade .25s ease"></div>
+      </sc-if>
+
+      <!-- CONFIDENCE SHEET -->
+      <sc-if value="{{ pConf }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:40;background:#fff;border-radius:30px 30px 42px 42px;padding:24px 22px 30px;box-shadow:0 -16px 40px -10px rgba(40,20,80,.3);animation:tt-slideup .42s cubic-bezier(.34,1.4,.5,1)">
+        <div style="width:44px;height:5px;border-radius:5px;background:#e6def0;margin:0 auto 16px"></div>
+        <div style="text-align:center;font-size:24px;font-weight:700;color:#2a2540;line-height:1.1">How sure are you?</div>
+        <div style="text-align:center;font-size:14px;color:#9890ad;margin:5px 0 20px">Bet your confidence — more risk, more points</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ confLevels }}" as="cl" hint-placeholder-count="3">
+            <button onClick="{{ cl.onClick }}" style="{{ cl.style }}">
+              <div style="flex:1;text-align:left">
+                <div style="font-size:18px;font-weight:700">{{ cl.name }}</div>
+                <div style="font-size:13px;opacity:.85;font-weight:500">{{ cl.desc }}</div>
+              </div>
+              <div style="{{ cl.ptStyle }}">{{ cl.pts }}</div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- CROWD SHEET -->
+      <sc-if value="{{ pCrowd }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:40;background:#fff;border-radius:30px 30px 42px 42px;padding:24px 22px 30px;box-shadow:0 -16px 40px -10px rgba(40,20,80,.3);animation:tt-slideup .42s cubic-bezier(.34,1.4,.5,1)">
+        <div style="width:44px;height:5px;border-radius:5px;background:#e6def0;margin:0 auto 16px"></div>
+        <div style="text-align:center;font-size:24px;font-weight:700;color:#2a2540;line-height:1.1">Beat the Crowd</div>
+        <div style="text-align:center;font-size:14px;color:#9890ad;margin:5px 0 20px">How many players got this right?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <sc-for list="{{ crowdBuckets }}" as="cb" hint-placeholder-count="4">
+            <button onClick="{{ cb.onClick }}" style="{{ cb.style }}">{{ cb.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- REVEAL SHEET -->
+      <sc-if value="{{ pReveal }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:45;background:#fff;border-radius:30px 30px 42px 42px;padding:0 0 26px;box-shadow:0 -16px 40px -10px rgba(40,20,80,.3);animation:tt-slideup .4s cubic-bezier(.34,1.4,.5,1);overflow:hidden">
+        <div style="position:absolute;inset:0;pointer-events:none;z-index:5">{{ confetti }}</div>
+        <div style="{{ revealHeadStyle }}">
+          <div style="position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.5);animation:tt-burst .7s ease-out forwards"></div>
+          <div style="position:relative;animation:tt-count .55s cubic-bezier(.34,1.7,.5,1)">
+            <div style="font-size:54px;font-weight:700;line-height:1">{{ revealPts }}</div>
+            <div style="font-size:19px;font-weight:600;letter-spacing:.5px;opacity:.95">{{ revealTitle }}</div>
+          </div>
+        </div>
+        <div style="padding:18px 22px 0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <span style="font-size:13px;font-weight:600;color:{{ revealAccent }};background:{{ revealChip }};padding:5px 12px;border-radius:14px">{{ confName }}</span>
+            <sc-if value="{{ showCrowdResult }}" hint-placeholder-val="{{ false }}">
+              <span style="{{ crowdResultStyle }}">{{ crowdResultText }}</span>
+            </sc-if>
+          </div>
+          <div style="background:#f7f4fc;border-radius:18px;padding:15px 16px;display:flex;gap:11px;align-items:flex-start">
+            <div style="width:26px;height:26px;border-radius:9px;background:{{ accent }};color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none">i</div>
+            <div style="font-size:14.5px;color:#46415c;line-height:1.4;font-weight:500;text-wrap:pretty">{{ qExplain }}</div>
+          </div>
+          <sc-if value="{{ showStats }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;margin-top:13px;padding:0 2px">
+            <div style="flex:1;height:9px;background:#ece5f4;border-radius:6px;overflow:hidden">
+              <div style="height:100%;width:{{ crowdPctStr }};background:linear-gradient(90deg,#7b5cff,#4cc9f0);border-radius:6px"></div>
+            </div>
+            <div style="font-size:13px;color:#9890ad;font-weight:600;white-space:nowrap">{{ crowdStatText }}</div>
+          </div>
+          </sc-if>
+          <button onClick="{{ next }}" style="margin-top:18px;width:100%;border:none;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,{{ accent }},{{ accentSh }});color:#fff;font-size:18px;font-weight:700;padding:16px;border-radius:20px;box-shadow:0 6px 0 {{ accentSh }}">{{ nextLabel }}</button>
+        </div>
+      </div>
+      </sc-if>
+    </sc-if>
+
+    <!-- BOTTOM NAV -->
+    <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:none;height:78px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-top:1.5px solid #f0ebf7;display:flex;align-items:flex-start;padding:11px 14px 0;z-index:20">
+      <div onClick="{{ goHome }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none"><path d="M3.5 11.5 12 4l8.5 7.5" stroke="{{ navHome }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9.5h13V10" stroke="{{ navHome }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size:11px;font-weight:600;color:{{ navHome }}">Home</span>
+      </div>
+      <div onClick="{{ playDaily }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="16" rx="4" stroke="{{ navDaily }}" stroke-width="2.2"/><path d="M4 9.5h16M8.5 3v4M15.5 3v4" stroke="{{ navDaily }}" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <span style="font-size:11px;font-weight:600;color:{{ navDaily }}">Daily</span>
+      </div>
+      <div onClick="{{ goProfile }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none"><rect x="4" y="12" width="4" height="8" rx="1.5" fill="{{ navStats }}"/><rect x="10" y="7" width="4" height="13" rx="1.5" fill="{{ navStats }}"/><rect x="16" y="4" width="4" height="16" rx="1.5" fill="{{ navStats }}"/></svg>
+        <span style="font-size:11px;font-weight:600;color:{{ navStats }}">Stats</span>
+      </div>
+      <div onClick="{{ goSettings }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none"><path d="M5 8h14M5 16h14" stroke="{{ navSet }}" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="8" r="2.6" fill="{{ appBg }}" stroke="{{ navSet }}" stroke-width="2.2"/><circle cx="15" cy="16" r="2.6" fill="{{ appBg }}" stroke="{{ navSet }}" stroke-width="2.2"/></svg>
+        <span style="font-size:11px;font-weight:600;color:{{ navSet }}">Settings</span>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- home indicator -->
+    <div style="position:absolute;left:50%;bottom:9px;transform:translateX(-50%);width:130px;height:5px;border-radius:5px;background:rgba(40,30,70,.22);z-index:70"></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:456,&quot;height&quot;:906},&quot;confettiOn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showGlobalStats&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;hintsEnabled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.MODES = {
+      classic:  {name:'Classic Trivia', accent:'#ff4d6d', sh:'#d63659', chip:'#fff0f3', needCat:true},
+      truthlie: {name:'Truth or Lie',   accent:'#1ba0cf', sh:'#1583a8', chip:'#e8f8fe'},
+      trap:     {name:'Trap Questions', accent:'#e8890b', sh:'#c2730a', chip:'#fff6e0'},
+      beatcrowd:{name:'Beat the Crowd', accent:'#0fa066', sh:'#0c8052', chip:'#e6f8ef', crowd:true},
+      streak:   {name:'Streak Run',     accent:'#7b5cff', sh:'#5f3fe0', chip:'#f1ecff', endless:true},
+      rush:     {name:'Category Rush',  accent:'#1ba0cf', sh:'#1583a8', chip:'#e8f8fe', needCat:true, rush:true},
+      daily:    {name:'Daily 10',       accent:'#ff4d6d', sh:'#d63659', chip:'#fff0f3'},
+      hard:     {name:'Hard Mode',      accent:'#2a2540', sh:'#15101f', chip:'#ece9f4', hard:true},
+    };
+    this.CATS = ['All','History','Science','Football','Movies','Geography','Animals','Weird facts'];
+    this.CATMETA = {
+      'All':        {g:'linear-gradient(150deg,#a98bff,#7b5cff)', sh:'#5f3fe0', art:'<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 2.6l2.5 5.1 5.6.8-4 4 .9 5.6L12 21.5 7 19l.9-5.6-4-4 5.6-.8L12 2.6Z" fill="#7b5cff"/></svg>'},
+      'History':    {g:'linear-gradient(150deg,#e0ad55,#b9742a)', sh:'#94591c', art:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 8h16M3 20h18M6 8v10M10 8v10M14 8v10M18 8v10" stroke="#b9742a" stroke-width="2" stroke-linecap="round"/><path d="M12 2 4 8h16L12 2Z" fill="#b9742a"/></svg>'},
+      'Science':    {g:'linear-gradient(150deg,#3ee08f,#0fa066)', sh:'#0c8052', art:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M10 3h4M10.5 3v6L5.5 18a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3l-5-9V3" stroke="#0fa066" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 14h8l2.5 4.5a1.5 1.5 0 0 1-1.3 2.5H6.8a1.5 1.5 0 0 1-1.3-2.5L8 14Z" fill="#0fa066"/></svg>'},
+      'Football':   {g:'linear-gradient(150deg,#4fcef5,#1ba0cf)', sh:'#1583a8', art:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" fill="#1ba0cf"/><path d="M12 6.5l3.2 2.3-1.2 3.8h-4L8.8 8.8 12 6.5Z" fill="#fff"/><path d="M12 6.5V3.2M15.2 8.8l3-1.4M13.9 12.6l2 2.6M10 12.6l-2 2.6M8.8 8.8l-3-1.4" stroke="#fff" stroke-width="1.5"/></svg>'},
+      'Movies':     {g:'linear-gradient(150deg,#ff89a3,#ff4d6d)', sh:'#d63659', art:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="11" rx="2" fill="#ff4d6d"/><path d="M3.4 9 6 4.6l3.6 3.4M9.8 8 13 4 16.6 7.4M16.6 7.6 19.4 4l1.4 3.6" stroke="#ff4d6d" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="14.5" r="1.6" fill="#fff"/><circle cx="15" cy="14.5" r="1.6" fill="#fff"/></svg>'},
+      'Geography':  {g:'linear-gradient(150deg,#8b9bff,#5b6cf0)', sh:'#4250d0', art:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" fill="#5b6cf0"/><path d="M3 12h18M12 2.8c2.6 2.4 2.6 16 0 18.4M12 2.8c-2.6 2.4-2.6 16 0 18.4" stroke="#fff" stroke-width="1.5"/></svg>'},
+      'Animals':    {g:'linear-gradient(150deg,#ffc15c,#f59008)', sh:'#c2730a', art:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="16" rx="4.4" ry="3.6" fill="#f59008"/><circle cx="6.5" cy="11" r="2.1" fill="#f59008"/><circle cx="17.5" cy="11" r="2.1" fill="#f59008"/><circle cx="9.3" cy="7.3" r="2.1" fill="#f59008"/><circle cx="14.7" cy="7.3" r="2.1" fill="#f59008"/></svg>'},
+      'Weird facts':{g:'linear-gradient(150deg,#ff8fd6,#d6336c)', sh:'#a8235a', art:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M13 2 4 13h6l-1 9 9-11h-6l1-9Z" fill="#d6336c"/></svg>'},
+    };
+    this.KINDART = {
+      trap:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.2 22 20.2H2L12 3.2Z" fill="#f59008"/><path d="M12 9.6v4.3" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.25" fill="#fff"/></svg>',
+      truthlie:'<svg width="42" height="24" viewBox="0 0 32 24" fill="none"><circle cx="9" cy="12" r="8" fill="#19c37d"/><path d="M5.6 12.3 8 14.7l4-4.7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="12" r="8" fill="#ff4d6d"/><path d="M20.2 9.2 25.8 14.8M25.8 9.2 20.2 14.8" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    };
+    this.Q = [
+      {id:'h1',cat:'History',kind:'classic',q:'In which year did World War II end?',o:['1939','1945','1950','1918'],a:1,e:'World War II ended in 1945 with the surrender of Japan in September.',c:78},
+      {id:'h2',cat:'History',kind:'classic',q:'Who was the first President of the United States?',o:['Abraham Lincoln','George Washington','Thomas Jefferson','John Adams'],a:1,e:'George Washington served as the first U.S. President from 1789.',c:88},
+      {id:'h3',cat:'History',kind:'classic',hard:true,q:'The Great Pyramid of Giza was built as a tomb for which pharaoh?',o:['Tutankhamun','Khufu','Ramesses II','Cleopatra'],a:1,e:'It was built for Pharaoh Khufu around 2560 BC.',c:41},
+      {id:'s1',cat:'Science',kind:'classic',q:'What is the chemical symbol for gold?',o:['Go','Gd','Au','Ag'],a:2,e:'Au comes from the Latin word "aurum".',c:62},
+      {id:'s2',cat:'Science',kind:'classic',q:'How many bones are in the adult human body?',o:['186','206','226','246'],a:1,e:'Adults have 206 bones; babies are born with around 300.',c:55},
+      {id:'s3',cat:'Science',kind:'classic',q:'What planet is known as the Red Planet?',o:['Venus','Mars','Jupiter','Mercury'],a:1,e:'Mars looks red because of iron oxide (rust) on its surface.',c:92},
+      {id:'s4',cat:'Science',kind:'classic',q:'What gas do plants absorb from the atmosphere?',o:['Oxygen','Nitrogen','Carbon dioxide','Hydrogen'],a:2,e:'Plants take in CO₂ and release oxygen during photosynthesis.',c:80},
+      {id:'f1',cat:'Football',kind:'classic',q:'Which country has won the most FIFA World Cups?',o:['Germany','Brazil','Argentina','Italy'],a:1,e:'Brazil has won 5 World Cups, more than any other nation.',c:58},
+      {id:'f2',cat:'Football',kind:'classic',q:'How many players per team are on the pitch in football?',o:['9','10','11','12'],a:2,e:'Each team fields 11 players, including the goalkeeper.',c:84},
+      {id:'f3',cat:'Football',kind:'classic',hard:true,q:'Which club has won the most UEFA Champions League titles?',o:['Barcelona','Real Madrid','Bayern Munich','Liverpool'],a:1,e:'Real Madrid leads with the most European Cup / Champions League titles.',c:49},
+      {id:'m1',cat:'Movies',kind:'classic',hard:true,q:"Which film features the line \u201CHere\u2019s looking at you, kid\u201D?",o:['Gone with the Wind','Casablanca','Citizen Kane','The Great Gatsby'],a:1,e:'The line is from the 1942 classic Casablanca.',c:38},
+      {id:'m2',cat:'Movies',kind:'classic',q:"Who directed the movie \u201CJaws\u201D?",o:['George Lucas','Steven Spielberg','Francis Ford Coppola','Martin Scorsese'],a:1,e:'Spielberg directed Jaws in 1975, defining the summer blockbuster.',c:60},
+      {id:'m3',cat:'Movies',kind:'classic',q:'Which film is the highest-grossing of all time (unadjusted)?',o:['Avatar','Titanic','Avengers: Endgame','Star Wars'],a:0,e:'Avatar (2009) reclaimed the top spot after re-releases.',c:44},
+      {id:'g1',cat:'Geography',kind:'classic',hard:true,q:'What is the capital of Australia?',o:['Sydney','Melbourne','Canberra','Perth'],a:2,e:'Canberra is the capital \u2014 not Sydney or Melbourne.',c:35},
+      {id:'g2',cat:'Geography',kind:'classic',q:'Which is the largest hot desert in the world?',o:['Sahara','Gobi','Kalahari','Arabian'],a:0,e:'The Sahara spans about 9.2 million km\u00B2 across North Africa.',c:66},
+      {id:'g3',cat:'Geography',kind:'classic',q:'Mount Everest sits in which mountain range?',o:['Andes','Alps','Himalayas','Rockies'],a:2,e:'Everest is in the Himalayas, on the Nepal\u2013China border.',c:75},
+      {id:'a1',cat:'Animals',kind:'classic',q:'What is the largest land animal?',o:['African elephant','Hippopotamus','White rhino','Giraffe'],a:0,e:'The African bush elephant is the largest land animal.',c:82},
+      {id:'a2',cat:'Animals',kind:'classic',hard:true,q:'How many hearts does an octopus have?',o:['1','2','3','4'],a:2,e:'Octopuses have 3 hearts: two pump to the gills, one to the body.',c:28},
+      {id:'a3',cat:'Animals',kind:'classic',q:'Which of these birds cannot fly?',o:['Eagle','Penguin','Sparrow','Falcon'],a:1,e:'Penguins are flightless but are superb swimmers.',c:90},
+      {id:'w1',cat:'Weird facts',kind:'classic',hard:true,q:'What is a group of flamingos called?',o:['A flamboyance','A flock','A pod','A herd'],a:0,e:'A group of flamingos is called a \u201Cflamboyance\u201D.',c:33},
+      {id:'w2',cat:'Weird facts',kind:'classic',q:'Which of these foods essentially never spoils?',o:['Milk','Honey','Bread','Eggs'],a:1,e:'Honey can last thousands of years thanks to its chemistry.',c:57},
+      {id:'t1',cat:'Truth or Lie',kind:'truthlie',hard:true,q:'Which of these is actually TRUE?',o:['Sharks are older than trees','Bananas grow on trees','Goldfish have a 3-second memory','Lightning never strikes twice'],a:0,e:'Sharks predate trees by about 90 million years.',c:39},
+      {id:'t2',cat:'Truth or Lie',kind:'truthlie',q:'Which statement is TRUE?',o:['The Eiffel Tower can be 15cm taller in summer','We only use 10% of our brains','Bats are blind','Goldfish have 3-second memories'],a:0,e:'Heat expands the iron, so the tower grows in summer.',c:47},
+      {id:'t3',cat:'Truth or Lie',kind:'truthlie',hard:true,q:'Which of these is actually TRUE?',o:['A day on Venus is longer than its year','The Great Wall is visible from space unaided','Ostriches bury their heads in sand','Goldfish cannot see color'],a:0,e:'Venus rotates so slowly that one day is longer than its year.',c:29},
+      {id:'t4',cat:'Truth or Lie',kind:'truthlie',q:'Which statement is TRUE?',o:['Humans have more than five senses','Sugar makes children hyperactive','Cracking knuckles causes arthritis','You lose most heat through your head'],a:0,e:'We have senses like balance and temperature beyond the classic five.',c:51},
+      {id:'p1',cat:'Trap',kind:'trap',hard:true,q:'How many months have 28 days?',o:['1','2','6','12'],a:3,e:'All 12 months have at least 28 days.',c:22},
+      {id:'p2',cat:'Trap',kind:'trap',q:'A farmer has 17 sheep. All but 9 run away. How many are left?',o:['8','9','0','17'],a:1,e:'\u201CAll but 9\u201D means 9 remain.',c:40},
+      {id:'p3',cat:'Trap',kind:'trap',q:'In a race, you pass the person in 2nd place. What place are you in?',o:['1st','2nd','3rd','Last'],a:1,e:'You take their spot \u2014 2nd place, not 1st.',c:45},
+      {id:'p4',cat:'Trap',kind:'trap',hard:true,q:'How many of each animal did Moses take on the Ark?',o:['2','7','1','0'],a:3,e:'It was Noah, not Moses, who built the Ark.',c:30},
+      {id:'p5',cat:'Trap',kind:'trap',q:'Which weighs more: a pound of feathers or a pound of bricks?',o:['Feathers','Bricks','They weigh the same','Depends on size'],a:2,e:'A pound is a pound \u2014 they weigh exactly the same.',c:58},
+      {id:'p6',cat:'Trap',kind:'trap',hard:true,q:'A plane crashes on the US\u2013Canada border. Where are the survivors buried?',o:['United States','Canada','Both sides','Survivors are not buried'],a:3,e:'Survivors are alive \u2014 you do not bury survivors.',c:48},
+    ];
+    this.BADGES = [
+      {id:'first',name:'First Win',desc:'Finish your first round',icon:'★'},
+      {id:'streak5',name:'On Fire',desc:'5 right in a row',icon:'∞'},
+      {id:'locked',name:'Locked In',desc:'Nail a Locked In answer',icon:'◆'},
+      {id:'perfect',name:'Flawless',desc:'Perfect round',icon:'✓'},
+      {id:'trapper',name:'Trap Dodger',desc:'Beat a trap question',icon:'!'},
+      {id:'crowd',name:'Mind Reader',desc:'Beat the Crowd',icon:'%'},
+    ];
+    this.CONF = [
+      {l:1,name:'Guessing',desc:'Worth a shot',pts:'+1',color:'#1ba0cf',sh:'#1583a8',chip:'#e8f8fe'},
+      {l:2,name:'Confident',desc:'Pretty sure',pts:'+2',color:'#e8890b',sh:'#c2730a',chip:'#fff6e0'},
+      {l:3,name:'Locked In',desc:'100% certain',pts:'+3',color:'#ff4d6d',sh:'#d63659',chip:'#fff0f3'},
+    ];
+    this.CROWD = ['0–25%','26–50%','51–75%','76–100%'];
+
+    this.state = {
+      screen:'home', mode:null, category:null,
+      queue:[], qIndex:0, phase:'answer',
+      selected:null, confidence:null, crowdGuess:null,
+      score:0, correct:0, total:0, run:0, bestRun:0,
+      eliminated:[], showCrowdHint:false,
+      hints:{fifty:2,crowd:2,skip:1},
+      timeLeft:60, lastWrong:false, newBadges:[], lastEarned:0,
+      sessionFlags:{}, resetArmed:false,
+      P:this.load(),
+    };
+    this._confetti=[]; this._timer=null;
+  }
+
+  load(){
+    const def={coins:240,totalScore:0,games:0,bestStreak:0,dayStreak:7,answered:0,right:0,badges:[],
+      settings:{sound:true,haptics:true,notif:false,theme:'candy'}};
+    try{const r=JSON.parse(localStorage.getItem('triviatrap_v1')); if(r){return Object.assign(def,r,{settings:Object.assign(def.settings,r.settings||{})});}}catch(e){}
+    return def;
+  }
+  save(P){ try{localStorage.setItem('triviatrap_v1',JSON.stringify(P));}catch(e){} }
+
+  componentWillUnmount(){ if(this._timer)clearInterval(this._timer); }
+
+  shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+  seedShuffle(arr){ const a=arr.slice(); let s=0; const d=new Date(); s=d.getFullYear()*1000+d.getMonth()*40+d.getDate(); const rnd=()=>{s=(s*9301+49297)%233280;return s/233280;}; for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+  buildQueue(mode,cat){
+    const Q=this.Q;
+    if(mode==='classic'||mode==='rush'){ const pool=cat==='All'?Q.filter(q=>q.kind==='classic'):Q.filter(q=>q.kind==='classic'&&q.cat===cat); return this.shuffle(pool); }
+    if(mode==='truthlie') return this.shuffle(Q.filter(q=>q.kind==='truthlie'));
+    if(mode==='trap') return this.shuffle(Q.filter(q=>q.kind==='trap'));
+    if(mode==='beatcrowd') return this.shuffle(Q.filter(q=>q.kind==='classic')).slice(0,6);
+    if(mode==='streak') return this.shuffle(Q);
+    if(mode==='hard') return this.shuffle(Q.filter(q=>q.hard));
+    if(mode==='daily') return this.seedShuffle(Q).slice(0,10);
+    return this.shuffle(Q).slice(0,6);
+  }
+
+  selectMode(mode){
+    const m=this.MODES[mode];
+    if(m.needCat){ this.setState({screen:'category',mode:mode}); return; }
+    this.begin(mode,null);
+  }
+  begin(mode,cat){
+    if(this._timer){clearInterval(this._timer);this._timer=null;}
+    const queue=this.buildQueue(mode,cat);
+    const m=this.MODES[mode];
+    this.setState({screen:'question',mode,category:cat,queue,qIndex:0,phase:'answer',
+      selected:null,confidence:null,crowdGuess:null,score:0,correct:0,total:0,run:0,bestRun:0,
+      eliminated:[],showCrowdHint:false,hints:{fifty:2,crowd:2,skip:1},timeLeft:60,lastWrong:false,
+      newBadges:[],lastEarned:0,sessionFlags:{}});
+    if(m.rush){ this._timer=setInterval(()=>this.tick(),1000); }
+  }
+  tick(){
+    const s=this.state;
+    if(s.screen!=='question'){return;}
+    if(s.phase==='reveal'){return;}
+    if(s.timeLeft<=1){ clearInterval(this._timer); this._timer=null; this.setState({timeLeft:0}); this.endGame(); return; }
+    this.setState(st=>({timeLeft:st.timeLeft-1}));
+  }
+
+  cur(){ return this.state.queue[this.state.qIndex]; }
+
+  pickAnswer(i){
+    if(this.state.phase!=='answer')return;
+    if(this.state.eliminated.indexOf(i)>=0)return;
+    this.setState({selected:i,phase:'confidence'});
+  }
+  pickConfidence(l){
+    if(this.MODES[this.state.mode].crowd){ this.setState({confidence:l,phase:'crowd'}); }
+    else { this.setState({confidence:l},()=>this.reveal()); }
+  }
+  pickCrowd(b){ this.setState({crowdGuess:b},()=>this.reveal()); }
+
+  reveal(){
+    const q=this.cur(); const s=this.state;
+    const isC=s.selected===q.a;
+    let pts=isC?s.confidence:0;
+    let crowdRight=false;
+    if(this.MODES[s.mode].crowd){ const bucket=q.c<26?0:q.c<51?1:q.c<76?2:3; crowdRight=s.crowdGuess===bucket; if(crowdRight)pts+=2; }
+    const run=isC?s.run+1:0;
+    const flags=Object.assign({},s.sessionFlags);
+    if(isC&&s.confidence===3)flags.locked=true;
+    if(isC&&q.kind==='trap')flags.trapper=true;
+    if(crowdRight)flags.crowd=true;
+    if(run>=5)flags.streak5=true;
+    if(this.props.confettiOn!==false && isC) this._confetti=this.genConfetti(); else this._confetti=[];
+    this.setState({phase:'reveal',lastEarned:pts,score:s.score+pts,correct:s.correct+(isC?1:0),
+      total:s.total+1,run,bestRun:Math.max(s.bestRun,run),lastWrong:!isC,
+      crowdRight,sessionFlags:flags});
+  }
+  genConfetti(){ const cols=['#ff4d6d','#ffb703','#4cc9f0','#19c37d','#7b5cff','#ff9eb3'];
+    return Array.from({length:18}).map((_,i)=>({left:(4+Math.random()*92).toFixed(1),delay:(Math.random()*0.28).toFixed(2),dur:(0.85+Math.random()*0.7).toFixed(2),size:(7+Math.random()*7).toFixed(0),round:Math.random()>0.5,col:cols[i%cols.length],rot:Math.floor(Math.random()*90)}));
+  }
+
+  next(){
+    const s=this.state, m=this.MODES[s.mode];
+    if(m.endless && s.lastWrong){ this.endGame(); return; }
+    let qi=s.qIndex+1, queue=s.queue;
+    if(qi>=queue.length){
+      if(m.rush){ queue=queue.concat(this.shuffle(this.buildQueue(s.mode,s.category))); }
+      else { this.endGame(); return; }
+    }
+    this.setState({qIndex:qi,queue,phase:'answer',selected:null,confidence:null,crowdGuess:null,eliminated:[],showCrowdHint:false});
+  }
+
+  endGame(){
+    if(this._timer){clearInterval(this._timer);this._timer=null;}
+    const s=this.state; const P=Object.assign({},this.state.P);
+    const flags=Object.assign({},s.sessionFlags);
+    if(s.total>0)flags.first=true;
+    if(s.correct===s.total&&s.total>0)flags.perfect=true;
+    const earnedCoins=Math.round(s.score*1.5);
+    const newB=[];
+    this.BADGES.forEach(b=>{ if(flags[b.id]&&P.badges.indexOf(b.id)<0){P.badges.push(b.id);newB.push(b);} });
+    P.coins+=earnedCoins; P.totalScore+=s.score; P.games+=1;
+    P.bestStreak=Math.max(P.bestStreak,s.bestRun);
+    P.answered+=s.total; P.right+=s.correct;
+    this.save(P);
+    this.setState({screen:'summary',P,newBadges:newB,summaryCoins:earnedCoins});
+  }
+
+  quit(){ if(this._timer){clearInterval(this._timer);this._timer=null;} this.setState({screen:'home'}); }
+  goHome(){ if(this._timer){clearInterval(this._timer);this._timer=null;} this.setState({screen:'home',resetArmed:false}); }
+
+  useHint(type){
+    const s=this.state; if(s.phase!=='answer')return;
+    if(type==='fifty'){ if(s.hints.fifty<=0)return; const q=this.cur(); const wrong=[0,1,2,3].filter(i=>i!==q.a); const rm=this.shuffle(wrong).slice(0,2); this.setState({eliminated:rm,hints:Object.assign({},s.hints,{fifty:s.hints.fifty-1})}); }
+    if(type==='crowd'){ if(s.hints.crowd<=0)return; this.setState({showCrowdHint:true,hints:Object.assign({},s.hints,{crowd:s.hints.crowd-1})}); }
+    if(type==='skip'){ if(s.hints.skip<=0)return; this.setState({hints:Object.assign({},s.hints,{skip:s.hints.skip-1})},()=>{ this.setState({total:this.state.total+1},()=>this.next()); }); }
+  }
+
+  toggleSetting(k){ const P=Object.assign({},this.state.P); P.settings=Object.assign({},P.settings,{[k]:!P.settings[k]}); this.save(P); this.setState({P}); }
+  setTheme(t){ const P=Object.assign({},this.state.P); P.settings=Object.assign({},P.settings,{theme:t}); this.save(P); this.setState({P}); }
+  resetProgress(){
+    if(!this.state.resetArmed){ this.setState({resetArmed:true}); setTimeout(()=>{ if(this.state.resetArmed)this.setState({resetArmed:false}); },3500); return; }
+    const fresh={coins:0,totalScore:0,games:0,bestStreak:0,dayStreak:1,answered:0,right:0,badges:[],settings:this.state.P.settings};
+    this.save(fresh); this.setState({P:fresh,resetArmed:false});
+  }
+
+  distFor(q){ const c=q.c; const rem=100-c; const others=[0,1,2,3].filter(i=>i!==q.a); const w=[0.5,0.32,0.18]; const d=[0,0,0,0]; d[q.a]=c; others.forEach((idx,k)=>{d[idx]=Math.round(rem*w[k]);}); return d; }
+
+  renderVals(){
+    const s=this.state, m=s.mode?this.MODES[s.mode]:this.MODES.classic;
+    const P=s.P;
+    const accent=m.accent, accentSh=m.sh;
+    const isQuestion=s.screen==='question';
+    const isHome=s.screen==='home';
+    const base={
+      isHome, isCategory:s.screen==='category', isQuestion, isSummary:s.screen==='summary',
+      isProfile:s.screen==='profile', isSettings:s.screen==='settings',
+      appBg: s.screen==='summary'?'#ffe1ec':(s.screen==='question'?`linear-gradient(180deg, ${m.chip} 0%, #faf7ff 36%)`:'#faf7ff'),
+      statusColor: '#2a2540',
+      showNav: isHome||s.screen==='profile'||s.screen==='settings',
+      coins:P.coins, accent, accentSh, modeName:m.name,
+      navHome: isHome?'#ff4d6d':'#c2bcd3',
+      navDaily: '#c2bcd3',
+      navStats: s.screen==='profile'?'#ff4d6d':'#c2bcd3',
+      navSet: s.screen==='settings'?'#ff4d6d':'#c2bcd3',
+      goHome:()=>this.goHome(), goProfile:()=>this.setState({screen:'profile'}), goSettings:()=>this.setState({screen:'settings'}),
+      playDaily:()=>this.selectMode('daily'), playClassic:()=>this.selectMode('classic'),
+      playTruthlie:()=>this.selectMode('truthlie'), playTrap:()=>this.selectMode('trap'),
+      playBeatcrowd:()=>this.selectMode('beatcrowd'), playStreak:()=>this.selectMode('streak'),
+      playRush:()=>this.selectMode('rush'), playHard:()=>this.selectMode('hard'),
+      hintsOn:this.props.hintsEnabled!==false,
+      showStats:this.props.showGlobalStats!==false,
+    };
+
+    // CATEGORY
+    base.categories=this.CATS.map(name=>{ const meta=this.CATME(name); const cnt=name==='All'?this.Q.filter(q=>q.kind==='classic').length:this.Q.filter(q=>q.kind==='classic'&&q.cat===name).length;
+      return {name, count:name==='All'?'Everything':cnt+' questions',
+        style:`position:relative;overflow:hidden;background:${meta.g};border-radius:22px;padding:16px;cursor:pointer;box-shadow:0 6px 0 ${meta.sh},0 14px 22px -12px ${meta.sh}cc`,
+        iconStyle:'position:relative;width:48px;height:48px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:11px;box-shadow:0 3px 0 rgba(0,0,0,.08)',
+        art:React.createElement('div',{style:{width:'32px',height:'32px',display:'flex',alignItems:'center',justifyContent:'center'},dangerouslySetInnerHTML:{__html:meta.art}}),
+        onClick:()=>this.begin(s.mode,name)}; });
+
+    if(isQuestion){
+      const q=this.cur();
+      base.qText=q?q.q:''; base.qExplain=q?q.e:'';
+      base.catLabel=q?(s.mode==='trap'?'Trap':s.mode==='truthlie'?'Truth or Lie':q.cat):'';
+      base.chipBg=m.chip;
+      base.score=s.score;
+      let _artHtml = q ? (q.kind==='trap'?this.KINDART.trap : q.kind==='truthlie'?this.KINDART.truthlie : (this.CATMETA[q.cat]?this.CATMETA[q.cat].art:this.CATMETA['All'].art)) : this.CATMETA['All'].art;
+      base.qArt = React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'center'},dangerouslySetInnerHTML:{__html:_artHtml}});
+      const total=s.queue.length;
+      base.progressPct=m.rush?Math.round(s.timeLeft/60*100)+'%':Math.round((s.qIndex+(s.phase==='reveal'?1:0))/Math.max(total,1)*100)+'%';
+      if(m.rush){ base.counterText=s.timeLeft+'s'; base.counterStyle='min-width:46px;text-align:center;font-size:15px;font-weight:700;color:'+(s.timeLeft<=10?'#ff4d6d':'#2a2540'); }
+      else if(m.endless){ base.counterText='Q'+(s.qIndex+1); base.counterStyle='min-width:46px;text-align:center;font-size:15px;font-weight:700;color:#2a2540'; }
+      else { base.counterText=(s.qIndex+1)+'/'+total; base.counterStyle='min-width:46px;text-align:center;font-size:15px;font-weight:700;color:#2a2540'; }
+
+      base.pConf=s.phase==='confidence'; base.pCrowd=s.phase==='crowd'; base.pReveal=s.phase==='reveal';
+      base.sheetOpen=s.phase==='confidence'||s.phase==='crowd';
+
+      const dist=s.showCrowdHint&&q?this.distFor(q):null;
+      const PAL=[{c:'#ff5e7c',sh:'#d63659'},{c:'#36c0ef',sh:'#1583a8'},{c:'#ffa928',sh:'#c2730a'},{c:'#9b7bff',sh:'#5f3fe0'}];
+      base.options=(q?q.o:['','','','']).map((text,i)=>{
+        const elim=s.eliminated.indexOf(i)>=0;
+        const sel=s.selected===i;
+        const isAns=s.phase==='answer';
+        const p=PAL[i];
+        let bg,border='none',shadow,color='#fff',labelBg='#fff',labelColor=p.c,opacity='1',mark='',markStyle='display:none',distText='',distStyle='display:none',anim='';
+        if(s.phase==='reveal'){
+          if(i===q.a){ bg='linear-gradient(150deg,#3ee08f,#0fa066)';shadow='0 6px 0 #0c8052';labelColor='#0fa066';mark='✓';markStyle='font-size:21px;font-weight:700;color:#fff'; }
+          else if(sel){ bg='linear-gradient(150deg,#ff7a93,#ff4d6d)';shadow='0 6px 0 #d63659';labelColor='#ff4d6d';mark='✕';markStyle='font-size:19px;font-weight:700;color:#fff';anim='tt-shake .5s'; }
+          else { bg='#fff';border='2px solid #f3eefa';shadow='0 4px 0 #ece5f4';color='#b8b2c8';labelBg='#f3eefa';labelColor='#c2bcd3';opacity='.65'; }
+        } else {
+          bg=`linear-gradient(150deg,${p.c},${p.sh})`;shadow=`0 6px 0 ${p.sh}`;
+          if(elim){ opacity='.3'; }
+          if(dist){ distText=dist[i]+'%'; distStyle='font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.28);padding:3px 9px;border-radius:9px'; }
+        }
+        const lift=sel&&s.phase!=='reveal';
+        return {key:i, label:'ABCD'[i], text,
+          style:`display:flex;align-items:center;gap:13px;width:100%;text-align:left;font-family:inherit;font-size:16px;font-weight:600;cursor:${(isAns&&!elim)?'pointer':'default'};background:${bg};border:${border};border-radius:20px;padding:15px 16px;box-shadow:${shadow};color:${color};opacity:${opacity};transition:all .18s;transform:translateY(${lift?'-3px':'0'}) scale(${lift?'1.02':'1'});${anim?'animation:'+anim+';':''}`,
+          labelStyle:`width:34px;height:34px;border-radius:11px;background:${labelBg};color:${labelColor};font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 2px 0 rgba(0,0,0,.08)`,
+          mark, markStyle, distText, distStyle,
+          disabled:!isAns||elim, onClick:()=>this.pickAnswer(i)};
+      });
+
+      // hints
+      const hs=(active,grad,sh)=>`flex:1;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-size:13px;font-weight:700;color:${active?'#fff':'#c2bcd3'};background:${active?grad:'#fff'};border:2px solid ${active?'transparent':'#f3eefa'};border-radius:16px;padding:11px 6px;box-shadow:0 4px 0 ${active?sh:'#ece5f4'};cursor:${active?'pointer':'default'};opacity:${active?'1':'.6'}`;
+      const hb=(active,color)=>`min-width:20px;height:20px;border-radius:10px;background:${active?'#fff':'#d8d2e6'};color:${active?color:'#fff'};font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px`;
+      const canHint=s.phase==='answer';
+      const a5=canHint&&s.hints.fifty>0, ac=canHint&&s.hints.crowd>0, as=canHint&&s.hints.skip>0;
+      base.hint5Style=hs(a5,'linear-gradient(150deg,#ffc15c,#f59008)','#c2730a'); base.hint5Count=s.hints.fifty; base.hint5BadgeStyle=hb(a5,'#f59008'); base.hintFifty=()=>this.useHint('fifty');
+      base.hintCStyle=hs(ac,'linear-gradient(150deg,#a98bff,#7b5cff)','#5f3fe0'); base.hintCCount=s.hints.crowd; base.hintCBadgeStyle=hb(ac,'#7b5cff'); base.hintCrowd=()=>this.useHint('crowd');
+      base.hintSStyle=hs(as,'linear-gradient(150deg,#2fe6c6,#12b39a)','#0d8f7c'); base.hintSCount=s.hints.skip; base.hintSBadgeStyle=hb(as,'#12b39a'); base.hintSkip=()=>this.useHint('skip');
+
+      base.quit=()=>this.quit();
+
+      // confidence sheet
+      base.confLevels=this.CONF.map(c=>({name:c.name,desc:c.desc,pts:c.pts,
+        style:`display:flex;align-items:center;gap:14px;width:100%;text-align:left;font-family:inherit;cursor:pointer;background:${c.color};color:#fff;border:none;border-radius:20px;padding:16px 18px;box-shadow:0 6px 0 ${c.sh}`,
+        ptStyle:`font-size:26px;font-weight:700;background:rgba(255,255,255,.22);border-radius:14px;padding:6px 14px`,
+        onClick:()=>this.pickConfidence(c.l)}));
+
+      // crowd sheet
+      base.crowdBuckets=this.CROWD.map((label,i)=>({label,
+        style:`font-family:inherit;font-size:18px;font-weight:700;color:#0fa066;cursor:pointer;background:#e6f8ef;border:2px solid #b6ecce;border-radius:18px;padding:20px;box-shadow:0 5px 0 #c4eed7`,
+        onClick:()=>this.pickCrowd(i)}));
+
+      // reveal
+      if(s.phase==='reveal'&&q){
+        const isC=s.selected===q.a;
+        base.revealHeadStyle=`position:relative;overflow:hidden;text-align:center;padding:30px 20px 26px;color:#fff;background:linear-gradient(140deg,${isC?'#22d07f,#0fa066':'#ff6b85,#e8425f'})`;
+        base.revealPts=(s.lastEarned>0?'+':'')+s.lastEarned;
+        base.revealTitle=isC?'CORRECT!':(s.confidence?'NOT QUITE':'WRONG');
+        base.revealAccent=accent; base.revealChip=m.chip;
+        const cn=this.CONF.find(c=>c.l===s.confidence);
+        base.confName=cn?cn.name+' · '+cn.pts:'';
+        base.confName= isC ? (cn?cn.name+' bet paid off':'') : (cn?cn.name+' bet — no points':'');
+        base.crowdPctStr=q.c+'%';
+        base.crowdStatText='Only '+q.c+'% got this right';
+        base.confetti = (this._confetti||[]).map((p,i)=>React.createElement('span',{key:i,style:{position:'absolute',left:p.left+'%',top:'-12px',width:p.size+'px',height:p.size+'px',background:p.col,borderRadius:p.round?'50%':'2px',transform:'rotate('+p.rot+'deg)',animation:`tt-confetti ${p.dur}s ${p.delay}s ease-in forwards`}}));
+        base.showCrowdResult=!!m.crowd;
+        if(m.crowd){ base.crowdResultText=s.crowdRight?'Crowd guess +2 ✓':'Crowd guess missed'; base.crowdResultStyle=`font-size:13px;font-weight:600;color:${s.crowdRight?'#0fa066':'#9890ad'};background:${s.crowdRight?'#e6f8ef':'#f3eefa'};padding:5px 12px;border-radius:14px`; }
+        base.nextLabel = (s.qIndex+1>=s.queue.length && !m.rush && !m.endless)?'See Results':(m.endless&&s.lastWrong?'See Results':'Next Question');
+        base.next=()=>this.next();
+      }
+    }
+
+    if(s.screen==='summary'){
+      base.score=s.score;
+      base.summaryKicker=m.name;
+      const perfect=s.correct===s.total&&s.total>0;
+      base.summaryTitle= perfect?'Flawless!':(s.correct>=s.total*0.6?'Nice run!':'Round complete');
+      const _acc=s.total?s.correct/s.total:0;
+      base.summaryEmoji= perfect?'🏆':(_acc>=0.6?'🎉':(_acc>=0.3?'👏':'🌱'));
+      base.summaryCorrect=s.correct+'/'+s.total;
+      base.summaryAcc=(s.total?Math.round(s.correct/s.total*100):0)+'%';
+      base.summaryBest=s.bestRun;
+      base.summaryCoins=s.summaryCoins||0;
+      base.newBadges=s.newBadges; base.hasNewBadges=s.newBadges&&s.newBadges.length>0;
+      base.playAgain=()=>{ if(this.MODES[s.mode].needCat&&s.category){this.begin(s.mode,s.category);} else {this.selectMode(s.mode);} };
+    }
+
+    if(s.screen==='profile'){
+      base.totalScore=P.totalScore; base.games=P.games; base.bestStreak=P.bestStreak;
+      base.dayStreak=P.dayStreak; base.level=Math.max(1,Math.floor(P.totalScore/200)+1);
+      base.lifetimeAcc=(P.answered?Math.round(P.right/P.answered*100):0)+'%';
+      base.badges=this.BADGES.map(b=>{ const earned=P.badges.indexOf(b.id)>=0;
+        return {icon:b.icon,name:b.name,
+          cardStyle:`display:flex;flex-direction:column;align-items:center;padding:16px 8px;border-radius:18px;background:${earned?'#fff':'#f3eff'};background:#fff;border:2px solid ${earned?'#ffe6b0':'#f3eefa'};box-shadow:0 4px 0 ${earned?'#ffe0a0':'#ece5f4'};opacity:${earned?'1':'.55'}`,
+          iconStyle:`width:46px;height:46px;border-radius:15px;background:${earned?'linear-gradient(150deg,#ffd166,#ffb703)':'#ece5f4'};color:${earned?'#fff':'#b8b2c8'};font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center`}; });
+      const lb=[{n:'QuizWhiz',s:9820},{n:'BrainBolt',s:7430},{n:'TrapKing',s:6210},{n:'You',s:P.totalScore,me:true},{n:'Lucky7',s:1980},{n:'Owlbert',s:1240}];
+      lb.sort((a,b)=>b.s-a.s);
+      base.leaderboard=lb.slice(0,6).map((r,i)=>({rank:i+1,name:r.n,score:r.s.toLocaleString(),
+        style:`display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:16px;${i<lb.length-1?'border-bottom:1.5px solid #f3eefa;':''}${r.me?'background:#fff0f3;border-bottom:none;':''}`,
+        rankStyle:`width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;${i===0?'background:#ffb703;color:#fff':i===1?'background:#c2bcd3;color:#fff':i===2?'background:#d6975a;color:#fff':'background:#f3eefa;color:#9890ad'}`,
+        scoreColor:r.me?'#ff4d6d':'#2a2540'}));
+    }
+
+    if(s.screen==='settings'){
+      const st=P.settings;
+      const mk=(k,name,desc,last)=>({name,desc,onClick:()=>this.toggleSetting(k),
+        rowStyle:`display:flex;align-items:center;padding:15px 0;${last?'':'border-bottom:1.5px solid #f3eefa'}`,
+        trackStyle:`width:50px;height:30px;border-radius:16px;background:${st[k]?'#19c37d':'#dcd6e8'};position:relative;cursor:pointer;transition:background .2s;flex:none`,
+        knobStyle:`position:absolute;top:3px;left:${st[k]?'23px':'3px'};width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .2s`});
+      base.toggles=[mk('sound','Sound effects','Pops, dings and celebrations'),mk('haptics','Haptics','Vibrate on answers'),mk('notif','Daily reminder','Nudge me to keep my streak',true)];
+      const themeDefs=[{id:'candy',name:'Candy',cols:['#ff4d6d','#ffb703','#4cc9f0']},{id:'berry',name:'Berry',cols:['#7b5cff','#ff6ec7','#2ec4b6']},{id:'mint',name:'Mint',cols:['#19c37d','#4cc9f0','#ffd166']}];
+      base.themes=themeDefs.map(t=>({name:t.name,onClick:()=>this.setTheme(t.id),
+        style:`flex:1;background:#fff;border:2px solid ${st.theme===t.id?'#ff4d6d':'#f3eefa'};border-radius:18px;padding:14px;cursor:pointer;box-shadow:0 4px 0 ${st.theme===t.id?'#ffc9d3':'#ece5f4'}`,
+        swatches:t.cols.map((c,i)=>React.createElement('i',{key:i,style:{width:'16px',height:'16px',borderRadius:'50%',background:c,display:'block'}}))}));
+      base.resetProgress=()=>this.resetProgress();
+      base.resetLabel=s.resetArmed?'Tap again to confirm reset':'Reset all progress';
+    }
+
+    return base;
+  }
+  CATME(name){ return this.CATMETA?this.CATMETA[name]:this.CATMETA[name]; }
+}
+</script>
+</body>
+</html>
