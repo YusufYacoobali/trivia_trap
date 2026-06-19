@@ -32,8 +32,7 @@
         "backgroundColor": "#ff4d6d"
       },
       "permissions": [
-        "RECEIVE_BOOT_COMPLETED",
-        "SCHEDULE_EXACT_ALARM"
+        "RECEIVE_BOOT_COMPLETED"
       ]
     },
     "web": {
