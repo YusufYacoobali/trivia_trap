@@ -321,13 +321,13 @@ const styles = StyleSheet.create({
   scoreLabel: { fontSize: 11, opacity: 0.85, letterSpacing: 0.5, color: '#fff' },
   scoreVal: { fontSize: 15, color: '#fff' },
 
-  qCard: { padding: 18, paddingBottom: 22, marginBottom: 18, borderWidth: 2 },
+  qCard: { padding: 18, paddingBottom: 22, marginBottom: 4, borderWidth: 2 },
   qHead: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   qChip: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
   qCat: { fontSize: 12, letterSpacing: 0.7 },
   qText: { fontSize: 23, color: C.ink, lineHeight: 29 },
 
-  hintRow: { flexDirection: 'row', gap: 9, marginBottom: 16 },
+  hintRow: { flexDirection: 'row', gap: 9, marginTop:14, marginBottom: 16 },
   hintWrap: { flex: 1 },
   hint: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, paddingVertical: 13, paddingHorizontal: 6 },
   hintInactive: { borderWidth: 2, borderColor: C.line, opacity: 0.6 },
