@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "triviatrap",
+    "icon": "./assets/app-icon/ios-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -17,6 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.triviatrap.app",
+      "icon": "./assets/app-icon/ios-icon.png",
       "infoPlist": {
         "UIBackgroundModes": [],
         "UIStatusBarHidden": true,
@@ -28,7 +30,9 @@
     },
     "android": {
       "package": "com.triviatrap.app",
+      "icon": "./assets/app-icon/android-icon.png",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/app-icon/android-icon.png",
         "backgroundColor": "#ff4d6d"
       },
       "permissions": [
