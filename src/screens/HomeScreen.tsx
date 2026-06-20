@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import Icon, { IconName } from '../components/Icon';
 import Raised from '../components/Raised';
@@ -56,7 +56,7 @@ export default function HomeScreen({ game }: { game: GameApi }) {
 
   return (
     <ScreenBackdrop>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="always">
       <View style={styles.header}>
         <Txt w={700} style={styles.logo}>
           <Txt w={700} style={{ color: C.ink, fontSize: 26 }}>
@@ -74,13 +74,11 @@ export default function HomeScreen({ game }: { game: GameApi }) {
               {coins}
             </Txt>
           </View>
-          <Pressable onPress={goProfile}>
-            <Raised radius={14} depth={4} shadowColor="#d63659" gradient={['#ff7a93', '#ff4d6d']} style={styles.avatar}>
-              <Txt w={700} style={styles.avatarText}>
-                Y
-              </Txt>
-            </Raised>
-          </Pressable>
+          <Raised onPress={goProfile} radius={14} depth={4} shadowColor="#d63659" gradient={['#ff7a93', '#ff4d6d']} style={styles.avatar}>
+            <Txt w={700} style={styles.avatarText}>
+              Y
+            </Txt>
+          </Raised>
         </View>
       </View>
 

@@ -11,7 +11,14 @@ import { C } from '../theme';
 
 function Toggle({ on, onPress }: { on: boolean; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} style={[styles.track, { backgroundColor: on ? '#19c37d' : '#dcd6e8' }]}>
+    <Pressable
+      onPress={onPress}
+      unstable_pressDelay={0}
+      delayLongPress={250}
+      hitSlop={8}
+      pressRetentionOffset={12}
+      style={[styles.track, { backgroundColor: on ? '#19c37d' : '#dcd6e8' }]}
+    >
       <View style={[styles.knob, { left: on ? 23 : 3 }]} />
     </Pressable>
   );
@@ -45,6 +52,7 @@ export default function SettingsScreen({ game }: { game: GameApi }) {
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingBottom: 30 + insets.bottom }]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
       >
         <Txt w={700} style={styles.h1}>
           Settings
@@ -73,7 +81,14 @@ export default function SettingsScreen({ game }: { game: GameApi }) {
           ))}
         </Raised>
 
-        <Pressable onPress={resetProgress} style={styles.reset}>
+        <Pressable
+          onPress={resetProgress}
+          unstable_pressDelay={0}
+          delayLongPress={250}
+          hitSlop={4}
+          pressRetentionOffset={12}
+          style={styles.reset}
+        >
           <Txt w={600} style={styles.resetText}>
             {state.resetArmed ? 'Tap again to confirm reset' : 'Reset all progress'}
           </Txt>

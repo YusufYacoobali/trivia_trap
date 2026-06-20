@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React from 'react';
 import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
 
 interface RaisedProps {
@@ -32,31 +32,31 @@ export default function Raised({
   gradientStart = { x: 0, y: 0 },
   gradientEnd = { x: 1, y: 1 },
 }: RaisedProps) {
-  const [pressed, setPressed] = useState(false);
-  const curDepth = pressed && onPress && !disabled ? Math.max(1, depth - 4) : depth;
-  const drop = depth - curDepth;
+  const makeFace = (isPressed = false) => {
+    const curDepth = isPressed && onPress && !disabled ? Math.max(1, depth - 4) : depth;
+    const drop = depth - curDepth;
+    const faceStyle: StyleProp<ViewStyle> = [
+      {
+        borderRadius: radius,
+        overflow: 'hidden',
+        transform: [{ translateY: drop }],
+      },
+      style,
+    ];
 
-  const faceStyle: StyleProp<ViewStyle> = [
-    {
-      borderRadius: radius,
-      overflow: 'hidden',
-      transform: [{ translateY: drop }],
-    },
-    style,
-  ];
-
-  const face = gradient ? (
-    <LinearGradient
-      colors={gradient as [string, string, ...string[]]}
-      start={gradientStart}
-      end={gradientEnd}
-      style={faceStyle}
-    >
-      {children}
-    </LinearGradient>
-  ) : (
-    <View style={[{ backgroundColor: faceColor }, faceStyle]}>{children}</View>
-  );
+    return gradient ? (
+      <LinearGradient
+        colors={gradient as [string, string, ...string[]]}
+        start={gradientStart}
+        end={gradientEnd}
+        style={faceStyle}
+      >
+        {children}
+      </LinearGradient>
+    ) : (
+      <View style={[{ backgroundColor: faceColor }, faceStyle]}>{children}</View>
+    );
+  };
 
   const outerStyle: StyleProp<ViewStyle> = {
     borderRadius: radius,
@@ -65,18 +65,20 @@ export default function Raised({
   };
 
   if (!onPress) {
-    return <View style={outerStyle}>{face}</View>;
+    return <View style={outerStyle}>{makeFace()}</View>;
   }
 
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
+      unstable_pressDelay={0}
+      delayLongPress={250}
+      hitSlop={4}
+      pressRetentionOffset={12}
       style={outerStyle}
     >
-      {face}
+      {({ pressed }) => makeFace(pressed)}
     </Pressable>
   );
 }

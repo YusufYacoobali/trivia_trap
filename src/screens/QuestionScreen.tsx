@@ -220,6 +220,7 @@ export default function QuestionScreen({ game }: { game: GameApi }) {
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingBottom: 28 + insets.bottom }]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
       >
         {/* top bar */}
         <View style={styles.topBar}>

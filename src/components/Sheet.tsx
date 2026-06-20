@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from 'react-native';
+import { Animated, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface SheetProps {
@@ -9,24 +9,22 @@ interface SheetProps {
   showHandle?: boolean;
 }
 
-// Bottom sheet that slides up on mount (mirrors the mockup's tt-slideup).
+// Bottom sheet. Keep it at its final layout position so child hitboxes line up
+// immediately; animating translateY can make first taps miss on Android.
 export default function Sheet({ children, zIndex = 40, style, showHandle = true }: SheetProps) {
-  const { height } = useWindowDimensions();
-  const ty = useRef(new Animated.Value(height)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
-    Animated.spring(ty, {
-      toValue: 0,
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 120,
       useNativeDriver: true,
-      damping: 18,
-      stiffness: 160,
-      mass: 0.9,
     }).start();
-  }, [ty]);
+  }, [opacity]);
 
   return (
-    <Animated.View style={[styles.sheet, { zIndex, transform: [{ translateY: ty }] }, style]}>
+    <Animated.View style={[styles.sheet, { zIndex, elevation: zIndex, opacity }, style]}>
       {showHandle ? (
         <View style={styles.handleWrap}>
           <View style={styles.handle} />

@@ -50,6 +50,7 @@ export default function ProfileScreen({ game }: { game: GameApi }) {
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingBottom: 30 + insets.bottom }]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
       >
         <View style={styles.headWrap}>
         <Raised radius={26} depth={7} shadowColor="#d63659" gradient={['#ff7a93', '#ff4d6d']} style={styles.avatar}>

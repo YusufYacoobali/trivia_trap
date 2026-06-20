@@ -28,6 +28,7 @@ export default function QuestionCountScreen({ game }: { game: GameApi }) {
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingBottom: 30 + insets.bottom }]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
       >
         <View style={styles.head}>
           <Raised onPress={onBack} radius={14} depth={4} shadowColor={C.lineDeep} faceColor="#fff" style={styles.back}>

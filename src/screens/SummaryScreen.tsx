@@ -55,6 +55,7 @@ export default function SummaryScreen({ game }: { game: GameApi }) {
   const mode = MODES[s.mode!];
   const accent = mode.accent;
   const accentSh = mode.sh;
+  const bottomClearance = Math.max(insets.bottom, 64);
 
   const perfect = s.correct === s.total && s.total > 0;
   const acc = s.total ? s.correct / s.total : 0;
@@ -96,8 +97,10 @@ export default function SummaryScreen({ game }: { game: GameApi }) {
       ))}
 
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: 40 + insets.bottom }]}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
       >
         <Txt style={styles.emoji}>{emoji}</Txt>
         <Txt w={700} style={[styles.kicker, { color: accent }]}>
@@ -153,22 +156,22 @@ export default function SummaryScreen({ game }: { game: GameApi }) {
           </Raised>
         ) : null}
 
-        <View style={{ width: '100%', marginTop: 20 }}>
-          <PrimaryButton label="Play Again ▶" accent={accent} accentSh={accentSh} onPress={playAgain} />
-        </View>
-        <View style={{ width: '100%', marginTop: 11 }}>
-          <Card onPress={goHome} radius={20} depth={4} shadowColor={C.lineDeep} borderColor={C.lineDeep} style={styles.secondary}>
-            <Txt w={600} style={styles.secondaryText}>
-              Back to Home
-            </Txt>
-          </Card>
-        </View>
       </ScrollView>
+
+      <View style={[styles.actionDock, { paddingBottom: bottomClearance }]}>
+        <PrimaryButton label="Play Again ▶" accent={accent} accentSh={accentSh} onPress={playAgain} />
+        <Card onPress={goHome} radius={20} depth={4} shadowColor={C.lineDeep} borderColor={C.lineDeep} style={styles.secondary}>
+          <Txt w={600} style={styles.secondaryText}>
+            Back to Home
+          </Txt>
+        </Card>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: { flex: 1 },
   scroll: { padding: 22, paddingTop: 24, paddingBottom: 40, alignItems: 'center' },
   emoji: { fontSize: 48, marginBottom: 6, lineHeight: 52 },
   kicker: { fontSize: 14, letterSpacing: 1, marginBottom: 4 },
@@ -198,6 +201,14 @@ const styles = StyleSheet.create({
   badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   badgeIcon: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
 
+  actionDock: {
+    paddingTop: 12,
+    paddingHorizontal: 22,
+    gap: 11,
+    backgroundColor: 'rgba(255, 245, 250, 0.96)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.72)',
+  },
   secondary: { paddingVertical: 14, alignItems: 'center' },
   secondaryText: { fontSize: 16, color: '#6b6584' },
 });

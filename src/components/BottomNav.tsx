@@ -16,7 +16,14 @@ interface NavItemProps {
 
 function NavItem({ icon, label, color, onPress }: NavItemProps) {
   return (
-    <Pressable style={styles.item} onPress={onPress}>
+    <Pressable
+      style={styles.item}
+      onPress={onPress}
+      unstable_pressDelay={0}
+      delayLongPress={250}
+      hitSlop={6}
+      pressRetentionOffset={12}
+    >
       <Icon name={icon} size={25} color={color} />
       <Txt w={600} style={[styles.label, { color }]}>
         {label}
