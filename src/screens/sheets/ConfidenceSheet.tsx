@@ -16,7 +16,7 @@ export default function ConfidenceSheet({ game }: { game: GameApi }) {
         How sure are you?
       </Txt>
       <Txt w={500} style={styles.sub}>
-        Bet your confidence — more risk, more points
+        Pick your confidence level for more points
       </Txt>
       <View style={{ gap: 12 }}>
         {CONF.map((c) => (

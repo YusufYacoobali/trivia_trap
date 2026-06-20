@@ -21,7 +21,7 @@ export default function RevealSheet({ game }: { game: GameApi }) {
   const pts = `${s.lastEarned > 0 ? '+' : ''}${s.lastEarned}`;
   const title = isC ? 'CORRECT!' : s.confidence ? 'NOT QUITE' : 'WRONG';
   const cn = CONF.find((c) => c.l === s.confidence);
-  const confName = isC ? (cn ? `${cn.name} bet paid off` : '') : cn ? `${cn.name} bet — no points` : '';
+  const confName = isC ? (cn ? `${cn.name} paid off` : '') : cn ? `${cn.name} - no points` : '';
 
   const lastQuestion = s.qIndex + 1 >= s.queue.length && !mode.rush && !mode.endless;
   const nextLabel = lastQuestion ? 'See Results' : mode.endless && s.lastWrong ? 'See Results' : 'Next Question';

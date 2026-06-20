@@ -16,7 +16,7 @@ import {
   Settings,
 } from './storage';
 
-export type Screen = 'home' | 'category' | 'question' | 'summary' | 'profile' | 'settings';
+export type Screen = 'home' | 'category' | 'questionCount' | 'question' | 'summary' | 'profile' | 'settings';
 export type Phase = 'answer' | 'confidence' | 'crowd' | 'reveal';
 
 export interface Confetti {
@@ -33,6 +33,7 @@ export interface GameState {
   screen: Screen;
   mode: ModeId | null;
   category: string | null;
+  questionLimit: number | null;
   queue: Question[];
   qIndex: number;
   phase: Phase;
@@ -78,6 +79,7 @@ function initialState(): GameState {
     screen: 'home',
     mode: null,
     category: null,
+    questionLimit: null,
     queue: [],
     qIndex: 0,
     phase: 'answer',
@@ -110,7 +112,9 @@ export interface GameApi {
   confetti: Confetti[];
   cur: () => Question | undefined;
   selectMode: (mode: ModeId) => void;
-  begin: (mode: ModeId, cat: string | null) => void;
+  selectCategory: (cat: string) => void;
+  begin: (mode: ModeId, cat: string | null, questionLimit?: number | null) => void;
+  cancelAnswerSelection: () => void;
   pickAnswer: (i: number) => void;
   pickConfidence: (l: number) => void;
   pickCrowd: (b: number) => void;
@@ -248,15 +252,16 @@ export function useGame(): GameApi {
   }, [clearTimer, endGame, patch]);
 
   const begin = useCallback(
-    (mode: ModeId, cat: string | null) => {
+    (mode: ModeId, cat: string | null, questionLimit?: number | null) => {
       clearTimer();
-      const queue = buildQueue(mode, cat);
+      const queue = buildQueue(mode, cat, questionLimit);
       const m = MODES[mode];
       confettiRef.current = [];
       patch({
         screen: 'question',
         mode,
         category: cat,
+        questionLimit: questionLimit ?? null,
         queue,
         qIndex: 0,
         phase: 'answer',
@@ -288,12 +293,19 @@ export function useGame(): GameApi {
     (mode: ModeId) => {
       const m = MODES[mode];
       if (m.needCat) {
-        patch({ screen: 'category', mode });
+        patch({ screen: 'category', mode, category: null, questionLimit: null });
         return;
       }
       begin(mode, null);
     },
     [begin, patch],
+  );
+
+  const selectCategory = useCallback(
+    (cat: string) => {
+      patch({ screen: 'questionCount', category: cat });
+    },
+    [patch],
   );
 
   const pickAnswer = useCallback(
@@ -306,6 +318,12 @@ export function useGame(): GameApi {
     },
     [patch],
   );
+
+  const cancelAnswerSelection = useCallback(() => {
+    const s = stateRef.current;
+    if (s.phase !== 'confidence') return;
+    patch({ selected: null, confidence: null, phase: 'answer' });
+  }, [patch]);
 
   const pickConfidence = useCallback(
     (l: number) => {
@@ -338,8 +356,8 @@ export function useGame(): GameApi {
     let qi = s.qIndex + 1;
     let queue = s.queue;
     if (qi >= queue.length) {
-      if (m.rush) {
-        queue = queue.concat(shuffle(buildQueue(s.mode as ModeId, s.category)));
+      if (m.rush && !s.questionLimit) {
+        queue = queue.concat(shuffle(buildQueue(s.mode as ModeId, s.category, s.questionLimit)));
       } else {
         endGame();
         return;
@@ -434,7 +452,9 @@ export function useGame(): GameApi {
     confetti: confettiRef.current,
     cur,
     selectMode,
+    selectCategory,
     begin,
+    cancelAnswerSelection,
     pickAnswer,
     pickConfidence,
     pickCrowd,

@@ -41,10 +41,11 @@ export function shuffleOptions(q: Question): Question {
   return { ...q, o, a };
 }
 
-export function buildQueue(mode: ModeId, cat: string | null): Question[] {
+export function buildQueue(mode: ModeId, cat: string | null, questionLimit?: number | null): Question[] {
   const pool = getQuestionsForMode(mode, cat, QUESTIONS);
   const queue = mode === 'daily' ? seedShuffle(pool) : shuffle(pool);
-  return limitQuestionsForMode(mode, queue).map(shuffleOptions);
+  const limited = typeof questionLimit === 'number' ? queue.slice(0, questionLimit) : limitQuestionsForMode(mode, queue);
+  return limited.map(shuffleOptions);
 }
 
 // Plausible answer-distribution for the "Crowd" hint, summing to ~100%.

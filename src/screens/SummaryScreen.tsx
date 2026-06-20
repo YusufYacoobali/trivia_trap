@@ -64,7 +64,7 @@ export default function SummaryScreen({ game }: { game: GameApi }) {
 
   const playAgain = () => {
     if (mode.needCat && s.category) {
-      begin(s.mode!, s.category);
+      begin(s.mode!, s.category, s.questionLimit);
     } else {
       selectMode(s.mode!);
     }

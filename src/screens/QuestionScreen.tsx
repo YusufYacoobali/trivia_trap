@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Card from '../components/Card';
@@ -194,7 +194,7 @@ function Hint({ label, count, active, grad, sh, badgeColor, onPress }: HintProps
 // ── screen (layout only) ──────────────────────────────────────────────────────
 
 export default function QuestionScreen({ game }: { game: GameApi }) {
-  const { state, quit, useHint } = game;
+  const { state, quit, useHint, cancelAnswerSelection } = game;
   const insets = useSafeAreaInsets();
   const s = state;
   const mode = MODES[s.mode!];
@@ -209,8 +209,6 @@ export default function QuestionScreen({ game }: { game: GameApi }) {
     : Math.round(((s.qIndex + (s.phase === 'reveal' ? 1 : 0)) / Math.max(total, 1)) * 100);
 
   const canHint = s.phase === 'answer';
-  const sheetOpen = s.phase === 'confidence' || s.phase === 'crowd';
-
   return (
     <View style={styles.root}>
       <LinearGradient colors={[mode.chip, C.appBg]} locations={[0, 0.5]} style={StyleSheet.absoluteFill} />
@@ -298,7 +296,8 @@ export default function QuestionScreen({ game }: { game: GameApi }) {
       </ScrollView>
 
       {/* overlays */}
-      {sheetOpen ? <View style={styles.dim} /> : null}
+      {s.phase === 'confidence' ? <Pressable onPress={cancelAnswerSelection} style={styles.dim} /> : null}
+      {s.phase === 'crowd' ? <View style={styles.dim} /> : null}
       {s.phase === 'confidence' ? <ConfidenceSheet game={game} /> : null}
       {s.phase === 'crowd' ? <CrowdSheet game={game} /> : null}
       {s.phase === 'reveal' ? <RevealSheet game={game} /> : null}

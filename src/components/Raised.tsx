@@ -37,7 +37,11 @@ export default function Raised({
   const drop = depth - curDepth;
 
   const faceStyle: StyleProp<ViewStyle> = [
-    { borderRadius: radius, marginBottom: curDepth, overflow: 'hidden' },
+    {
+      borderRadius: radius,
+      overflow: 'hidden',
+      transform: [{ translateY: drop }],
+    },
     style,
   ];
 
@@ -57,7 +61,7 @@ export default function Raised({
   const outerStyle: StyleProp<ViewStyle> = {
     borderRadius: radius,
     backgroundColor: shadowColor,
-    transform: [{ translateY: drop }],
+    paddingBottom: depth,
   };
 
   if (!onPress) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Raised from '../components/Raised';
@@ -27,7 +27,7 @@ const CATEGORY_ICONS: Record<string, ImageSourcePropType> = {
 };
 
 export default function CategoryScreen({ game }: { game: GameApi }) {
-  const { state, begin, goHome } = game;
+  const { state, selectCategory, goHome } = game;
   const insets = useSafeAreaInsets();
   const mode = state.mode!;
   const modeName = MODES[mode].name;
@@ -39,11 +39,9 @@ export default function CategoryScreen({ game }: { game: GameApi }) {
         showsVerticalScrollIndicator={false}
       >
       <View style={styles.head}>
-        <Pressable onPress={goHome}>
-          <Raised radius={14} depth={4} shadowColor={C.lineDeep} faceColor="#fff" style={styles.back}>
-            <Txt style={styles.backArrow}>&lt;</Txt>
-          </Raised>
-        </Pressable>
+        <Raised onPress={goHome} radius={14} depth={4} shadowColor={C.lineDeep} faceColor="#fff" style={styles.back}>
+          <Txt style={styles.backArrow}>&lt;</Txt>
+        </Raised>
         <View>
           <Txt w={700} style={styles.title}>
             Pick a category
@@ -60,7 +58,7 @@ export default function CategoryScreen({ game }: { game: GameApi }) {
           return (
             <View key={name} style={{ width: '48%' }}>
               <Raised
-                onPress={() => begin(mode, name)}
+                onPress={() => selectCategory(name)}
                 radius={22}
                 depth={6}
                 shadowColor={meta.sh}

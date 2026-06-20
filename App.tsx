@@ -15,6 +15,7 @@ import { SCREEN_BACKDROP_IMAGE } from './src/components/ScreenBackdrop';
 import { useGame } from './src/game/useGame';
 import CategoryScreen from './src/screens/CategoryScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import QuestionCountScreen from './src/screens/QuestionCountScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import QuestionScreen from './src/screens/QuestionScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -42,7 +43,7 @@ export default function App() {
   const showNav = screen === 'home' || screen === 'profile' || screen === 'settings';
   const immersive = screen === 'summary' || screen === 'question';
   const bg = screen === 'summary' ? '#ffe1ec' : C.appBg;
-  const showCandyBackdrop = screen === 'home' || screen === 'category';
+  const showCandyBackdrop = screen === 'home' || screen === 'category' || screen === 'questionCount';
 
   return (
     <SafeAreaProvider>
@@ -58,6 +59,7 @@ export default function App() {
           <View style={styles.body}>
             {screen === 'home' && <HomeScreen game={game} />}
             {screen === 'category' && <CategoryScreen game={game} />}
+            {screen === 'questionCount' && <QuestionCountScreen game={game} />}
             {screen === 'question' && <QuestionScreen game={game} />}
             {screen === 'summary' && <SummaryScreen game={game} />}
             {screen === 'profile' && <ProfileScreen game={game} />}
