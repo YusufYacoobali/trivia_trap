@@ -5,21 +5,23 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Raised from '../components/Raised';
 import ScreenBackdrop from '../components/ScreenBackdrop';
 import Txt from '../components/Txt';
-import { getCategoryQuestionCount, MODES } from '../data/game';
+import { MODES } from '../data/game';
 import { GameApi } from '../game/useGame';
 import { C } from '../theme';
 
 const QUESTION_COUNTS = [5, 10, 25, 50, 100] as const;
 
 export default function QuestionCountScreen({ game }: { game: GameApi }) {
-  const { state, begin, selectMode } = game;
+  const { state, begin, selectMode, goHome } = game;
   const insets = useSafeAreaInsets();
   const mode = state.mode ? MODES[state.mode] : null;
   const category = state.category;
 
-  if (!mode || !category || !state.mode) return null;
+  if (!mode || !state.mode) return null;
 
-  const available = getCategoryQuestionCount(category);
+  // Category-driven modes (Classic) came from the category picker; count-only
+  // modes (Truth or Lie, Trap, Beat the Crowd) came straight from home.
+  const onBack = mode.needCat ? () => selectMode(state.mode!) : goHome;
 
   return (
     <ScreenBackdrop>
@@ -28,14 +30,7 @@ export default function QuestionCountScreen({ game }: { game: GameApi }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.head}>
-          <Raised
-            onPress={() => selectMode(state.mode!)}
-            radius={14}
-            depth={4}
-            shadowColor={C.lineDeep}
-            faceColor="#fff"
-            style={styles.back}
-          >
+          <Raised onPress={onBack} radius={14} depth={4} shadowColor={C.lineDeep} faceColor="#fff" style={styles.back}>
             <Txt style={styles.backArrow}>&lt;</Txt>
           </Raised>
           <View>
@@ -43,41 +38,32 @@ export default function QuestionCountScreen({ game }: { game: GameApi }) {
               How many questions?
             </Txt>
             <Txt w={500} style={styles.subtitle}>
-              {category} - {mode.name}
+              {category ? `${category} - ${mode.name}` : mode.name}
             </Txt>
           </View>
         </View>
 
         <View style={styles.grid}>
-          {QUESTION_COUNTS.map((count) => {
-            const disabled = count > available;
-            return (
-              <View key={count} style={{ width: '48%' }}>
-                <Raised
-                  onPress={() => begin(state.mode!, category, count)}
-                  disabled={disabled}
-                  radius={22}
-                  depth={6}
-                  shadowColor={disabled ? C.lineDeep : mode.sh}
-                  gradient={disabled ? undefined : mode.gradient}
-                  faceColor={disabled ? '#fff' : undefined}
-                  style={[styles.countFace, disabled ? styles.disabledFace : null]}
-                >
-                  <Txt w={700} style={[styles.countValue, { color: disabled ? C.mutedSoft : '#fff' }]}>
-                    {count}
-                  </Txt>
-                  <Txt w={500} style={[styles.countLabel, { color: disabled ? C.mutedSoft : 'rgba(255,255,255,0.85)' }]}>
-                    questions
-                  </Txt>
-                </Raised>
-              </View>
-            );
-          })}
+          {QUESTION_COUNTS.map((count) => (
+            <View key={count} style={{ width: '48%' }}>
+              <Raised
+                onPress={() => begin(state.mode!, category, count)}
+                radius={22}
+                depth={6}
+                shadowColor={mode.sh}
+                gradient={mode.gradient}
+                style={styles.countFace}
+              >
+                <Txt w={700} style={styles.countValue}>
+                  {count}
+                </Txt>
+                <Txt w={500} style={styles.countLabel}>
+                  questions
+                </Txt>
+              </Raised>
+            </View>
+          ))}
         </View>
-
-        <Txt w={500} style={styles.available}>
-          {available} available in this category
-        </Txt>
       </ScrollView>
     </ScreenBackdrop>
   );
@@ -92,8 +78,6 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 13, color: C.muted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 13 },
   countFace: { minHeight: 104, alignItems: 'center', justifyContent: 'center', padding: 16 },
-  disabledFace: { borderWidth: 2, borderColor: C.line },
-  countValue: { fontSize: 34, lineHeight: 38 },
-  countLabel: { fontSize: 14, marginTop: 2 },
-  available: { textAlign: 'center', color: C.muted, fontSize: 13, marginTop: 22 },
+  countValue: { fontSize: 34, lineHeight: 38, color: '#fff' },
+  countLabel: { fontSize: 14, marginTop: 2, color: 'rgba(255,255,255,0.85)' },
 });

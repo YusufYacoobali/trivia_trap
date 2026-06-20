@@ -1,12 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Card from '../components/Card';
 import Icon, { IconName } from '../components/Icon';
 import Raised from '../components/Raised';
 import Txt from '../components/Txt';
+import { CATEGORY_ICONS } from '../data/categoryIcons';
 import { CATMETA, MODES } from '../data/game';
 import { Mode, Question } from '../data/types';
 import { distFor } from '../game/logic';
@@ -205,7 +206,7 @@ export default function QuestionScreen({ game }: { game: GameApi }) {
   const total = s.queue.length;
   const counter = getCounterText(s, mode, total);
   const progressPct = mode.rush
-    ? Math.round((s.timeLeft / 60) * 100)
+    ? Math.round((s.timeLeft / (mode.secondsPerQuestion ?? 60)) * 100)
     : Math.round(((s.qIndex + (s.phase === 'reveal' ? 1 : 0)) / Math.max(total, 1)) * 100);
 
   const canHint = s.phase === 'answer';
@@ -260,7 +261,11 @@ export default function QuestionScreen({ game }: { game: GameApi }) {
         >
           <View style={styles.qHead}>
             <View style={styles.qChip}>
-              <Icon name={qIcon(q)} size={26} />
+              {CATEGORY_ICONS[q.cat] ? (
+                <Image source={CATEGORY_ICONS[q.cat]} style={styles.qChipImg} resizeMode="contain" />
+              ) : (
+                <Icon name={qIcon(q)} size={26} />
+              )}
             </View>
             <Txt w={700} style={[styles.qCat, { color: accent }]}>
               {catLabel(q, s.mode!).toUpperCase()}
@@ -323,6 +328,7 @@ const styles = StyleSheet.create({
   qCard: { padding: 18, paddingBottom: 22, marginBottom: 4, borderWidth: 2 },
   qHead: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   qChip: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
+  qChipImg: { width: 40, height: 40 },
   qCat: { fontSize: 12, letterSpacing: 0.7 },
   qText: { fontSize: 23, color: C.ink, lineHeight: 29 },
 

@@ -241,7 +241,9 @@ export function useGame(): GameApi {
   const tick = useCallback(() => {
     const s = stateRef.current;
     if (s.screen !== 'question') return;
-    if (s.phase === 'reveal') return;
+    // Only count down while the player is actively choosing an answer; pause
+    // during the confidence/crowd sheets and the reveal.
+    if (s.phase !== 'answer') return;
     if (s.timeLeft <= 1) {
       clearTimer();
       patch({ timeLeft: 0 });
@@ -276,7 +278,7 @@ export function useGame(): GameApi {
         eliminated: [],
         showCrowdHint: false,
         hints: { fifty: 2, crowd: 2, skip: 1 },
-        timeLeft: 60,
+        timeLeft: m.secondsPerQuestion ?? 60,
         lastWrong: false,
         newBadges: [],
         lastEarned: 0,
@@ -296,6 +298,11 @@ export function useGame(): GameApi {
         patch({ screen: 'category', mode, category: null, questionLimit: null });
         return;
       }
+      // Category-less modes that still let the player choose a round length.
+      if (m.pickCount) {
+        patch({ screen: 'questionCount', mode, category: null, questionLimit: null });
+        return;
+      }
       begin(mode, null);
     },
     [begin, patch],
@@ -303,9 +310,15 @@ export function useGame(): GameApi {
 
   const selectCategory = useCallback(
     (cat: string) => {
+      const m = MODES[stateRef.current.mode as ModeId];
+      // Rush is an endless survival run, so it starts right after category.
+      if (m.rush) {
+        begin(m.id, cat);
+        return;
+      }
       patch({ screen: 'questionCount', category: cat });
     },
-    [patch],
+    [begin, patch],
   );
 
   const pickAnswer = useCallback(
@@ -349,15 +362,17 @@ export function useGame(): GameApi {
   const next = useCallback(() => {
     const s = stateRef.current;
     const m = MODES[s.mode as ModeId];
-    if (m.endless && s.lastWrong) {
+    // Survival modes (Streak Run, Category Rush) end the moment you miss one.
+    if ((m.endless || m.rush) && s.lastWrong) {
       endGame();
       return;
     }
     let qi = s.qIndex + 1;
     let queue = s.queue;
     if (qi >= queue.length) {
-      if (m.rush && !s.questionLimit) {
-        queue = queue.concat(shuffle(buildQueue(s.mode as ModeId, s.category, s.questionLimit)));
+      if (m.rush) {
+        // Rush never ends by running out of questions; keep refilling the queue.
+        queue = queue.concat(shuffle(buildQueue(s.mode as ModeId, s.category)));
       } else {
         endGame();
         return;
@@ -372,6 +387,8 @@ export function useGame(): GameApi {
       crowdGuess: null,
       eliminated: [],
       showCrowdHint: false,
+      // Reset the per-question clock for the next Rush question.
+      ...(m.secondsPerQuestion ? { timeLeft: m.secondsPerQuestion } : null),
     });
   }, [endGame, patch]);
 

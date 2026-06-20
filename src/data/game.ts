@@ -25,6 +25,7 @@ export const MODES: Record<ModeId, Mode> = {
     sh: '#1583a8',
     chip: '#e8f8fe',
     gradient: ['#4fcef5', '#1ba0cf'],
+    pickCount: true,
   },
   trap: {
     id: 'trap',
@@ -35,6 +36,7 @@ export const MODES: Record<ModeId, Mode> = {
     sh: '#c2730a',
     chip: '#fff6e0',
     gradient: ['#ffc15c', '#f59008'],
+    pickCount: true,
   },
   beatcrowd: {
     id: 'beatcrowd',
@@ -46,7 +48,7 @@ export const MODES: Record<ModeId, Mode> = {
     chip: '#e6f8ef',
     gradient: ['#3ee08f', '#0fa066'],
     crowd: true,
-    questionLimit: 6,
+    pickCount: true,
   },
   streak: {
     id: 'streak',
@@ -70,6 +72,7 @@ export const MODES: Record<ModeId, Mode> = {
     gradient: ['#2fe6c6', '#12b39a'],
     needCat: true,
     rush: true,
+    secondsPerQuestion: 20,
   },
   daily: {
     id: 'daily',

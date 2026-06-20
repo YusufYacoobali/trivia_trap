@@ -38,6 +38,10 @@ export interface Mode {
   hard?: boolean;
   questionLimit?: number;
   scoreMultiplier?: number;
+  // Ask the player how many questions they want before starting (no category).
+  pickCount?: boolean;
+  // Rush survival: seconds allowed per question before the run ends.
+  secondsPerQuestion?: number;
 }
 
 export interface Badge {

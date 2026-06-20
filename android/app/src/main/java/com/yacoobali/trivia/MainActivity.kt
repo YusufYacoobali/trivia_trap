@@ -1,4 +1,4 @@
-package com.triviatrap.app
+package com.yacoobali.trivia
 
 import android.os.Build
 import android.os.Bundle

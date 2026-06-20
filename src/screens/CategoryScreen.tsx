@@ -1,30 +1,14 @@
 import React from 'react';
-import { Image, ImageSourcePropType, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Raised from '../components/Raised';
 import ScreenBackdrop from '../components/ScreenBackdrop';
 import Txt from '../components/Txt';
-import { CATMETA, CATS, getCategoryQuestionCount, MODES } from '../data/game';
+import { CATEGORY_ICONS } from '../data/categoryIcons';
+import { CATMETA, CATS, MODES } from '../data/game';
 import { GameApi } from '../game/useGame';
 import { C } from '../theme';
-
-function countFor(cat: string): string {
-  if (cat === 'All') return 'Everything';
-  const n = getCategoryQuestionCount(cat);
-  return `${n} questions`;
-}
-
-const CATEGORY_ICONS: Record<string, ImageSourcePropType> = {
-  All: require('../../assets/category-icons/all.png'),
-  History: require('../../assets/category-icons/history.png'),
-  Science: require('../../assets/category-icons/science.png'),
-  Football: require('../../assets/category-icons/football.png'),
-  Movies: require('../../assets/category-icons/movies.png'),
-  Geography: require('../../assets/category-icons/geography.png'),
-  Animals: require('../../assets/category-icons/animals.png'),
-  'Weird facts': require('../../assets/category-icons/weird-facts.png'),
-};
 
 export default function CategoryScreen({ game }: { game: GameApi }) {
   const { state, selectCategory, goHome } = game;
@@ -71,9 +55,6 @@ export default function CategoryScreen({ game }: { game: GameApi }) {
                 <Txt w={600} style={styles.catName}>
                   {name}
                 </Txt>
-                <Txt w={500} style={styles.catCount}>
-                  {countFor(name)}
-                </Txt>
               </Raised>
             </View>
           );
@@ -97,5 +78,4 @@ const styles = StyleSheet.create({
   iconBox: { width: 54, height: 54, borderRadius: 17, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginBottom: 11 },
   iconImage: { width: 46, height: 46 },
   catName: { fontSize: 16, color: '#fff', lineHeight: 18 },
-  catCount: { fontSize: 12, color: 'rgba(255,255,255,0.82)', marginTop: 3 },
 });
