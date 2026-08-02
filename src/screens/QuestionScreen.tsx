@@ -33,7 +33,7 @@ const HINT_CONFIGS = [
   { key: 'crowd', label: 'Crowd', grad: ['#a98bff', '#7b5cff'], sh: '#5f3fe0', badgeColor: '#7b5cff' },
   { key: 'skip', label: 'Skip', grad: ['#2fe6c6', '#12b39a'], sh: '#0d8f7c', badgeColor: '#12b39a' },
 ] as const satisfies readonly {
-  key: keyof GameState['hints'];
+  key: 'fifty' | 'crowd' | 'skip';
   label: string;
   grad: [string, string];
   sh: string;
@@ -107,15 +107,18 @@ function getOptionVisualState(s: GameState, q: Question, index: number): OptionV
   };
 }
 
-// Counter shown top-right: timer for rush, Qn for endless, n/total otherwise.
-function getCounterText(s: GameState, mode: Mode, total: number): { text: string; color: string } {
-  if (mode.rush) {
-    return { text: `${s.timeLeft}s`, color: s.timeLeft <= 10 ? C.pink : C.ink };
-  }
-  if (mode.endless) {
-    return { text: `Q${s.qIndex + 1}`, color: C.ink };
-  }
-  return { text: `${s.qIndex + 1}/${total}`, color: C.ink };
+// Every mode is on a clock now, so the counter is always the countdown - it is
+// the only number that changes under you. Position lives in the progress bar
+// and the label beside it.
+function getCounterText(s: GameState, mode: Mode): { text: string; color: string } {
+  const limit = mode.secondsPerQuestion ?? 30;
+  const urgent = s.timeLeft <= Math.max(5, Math.round(limit * 0.25));
+  return { text: `${s.timeLeft}s`, color: urgent ? C.pink : C.ink };
+}
+
+function getPositionLabel(s: GameState, mode: Mode, total: number): string {
+  if (mode.rush || mode.endless) return `Q${s.qIndex + 1}`;
+  return `${s.qIndex + 1}/${total}`;
 }
 
 // ── small presentational components ───────────────────────────────────────────
@@ -204,7 +207,10 @@ export default function QuestionScreen({ game }: { game: GameApi }) {
 
   const { accent, sh: accentSh } = mode;
   const total = s.queue.length;
-  const counter = getCounterText(s, mode, total);
+  const counter = getCounterText(s, mode);
+  const position = getPositionLabel(s, mode, total);
+  // Rush is a survival run against the clock, so its bar drains with the timer.
+  // Everywhere else the bar is position, and the countdown sits beside it.
   const progressPct = mode.rush
     ? Math.round((s.timeLeft / (mode.secondsPerQuestion ?? 60)) * 100)
     : Math.round(((s.qIndex + (s.phase === 'reveal' ? 1 : 0)) / Math.max(total, 1)) * 100);
@@ -242,6 +248,9 @@ export default function QuestionScreen({ game }: { game: GameApi }) {
 
         {/* score */}
         <View style={styles.scoreRow}>
+          <Txt w={600} style={styles.position}>
+            {position}
+          </Txt>
           <Raised radius={20} depth={4} shadowColor={accentSh} gradient={[accent, accentSh]} style={styles.scorePill}>
             <Txt w={600} style={styles.scoreLabel}>
               SCORE
@@ -277,14 +286,15 @@ export default function QuestionScreen({ game }: { game: GameApi }) {
           </Txt>
         </Raised>
 
-        {/* hints */}
+        {/* hints - the Crowd read is withheld in Beat the Crowd, where reading
+            the crowd is the entire thing being scored */}
         <View style={styles.hintRow}>
-          {HINT_CONFIGS.map((h) => (
+          {HINT_CONFIGS.filter((h) => !(h.key === 'crowd' && mode.crowd)).map((h) => (
             <Hint
               key={h.key}
               label={h.label}
-              count={s.hints[h.key]}
-              active={canHint && s.hints[h.key] > 0}
+              count={s.P.inventory[h.key]}
+              active={canHint && s.P.inventory[h.key] > 0}
               grad={h.grad}
               sh={h.sh}
               badgeColor={h.badgeColor}
@@ -321,7 +331,8 @@ const styles = StyleSheet.create({
   progressFill: { height: '100%', borderRadius: 10 },
   counter: { minWidth: 46, textAlign: 'center', fontSize: 15 },
 
-  scoreRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 13 },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 13 },
+  position: { fontSize: 14, color: C.muted, paddingLeft: 4 },
   scorePill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingLeft: 13, paddingRight: 15 },
   scoreLabel: { fontSize: 11, opacity: 0.85, letterSpacing: 0.5, color: '#fff' },
   scoreVal: { fontSize: 15, color: '#fff' },

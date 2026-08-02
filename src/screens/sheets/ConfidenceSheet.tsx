@@ -16,7 +16,7 @@ export default function ConfidenceSheet({ game }: { game: GameApi }) {
         How sure are you?
       </Txt>
       <Txt w={500} style={styles.sub}>
-        Pick your confidence level for more points
+        Bet big for more points - and more to lose
       </Txt>
       <View style={{ gap: 12 }}>
         {CONF.map((c) => (
@@ -37,9 +37,16 @@ export default function ConfidenceSheet({ game }: { game: GameApi }) {
                 {c.desc}
               </Txt>
             </View>
-            <View style={styles.pts}>
-              <Txt w={700} style={styles.ptsText}>
-                {c.pts}
+            <View style={styles.stakes}>
+              <View style={styles.pts}>
+                <Txt w={700} style={styles.ptsText}>
+                  {c.pts}
+                </Txt>
+              </View>
+              {/* The downside is the whole point of the bet, so it is never
+                  hidden behind a tap. */}
+              <Txt w={600} style={styles.risk}>
+                {c.risk > 0 ? `-${c.risk} if wrong` : 'no penalty'}
               </Txt>
             </View>
           </Raised>
@@ -55,6 +62,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, paddingHorizontal: 18 },
   name: { fontSize: 18, color: '#fff' },
   desc: { fontSize: 13, color: 'rgba(255,255,255,0.85)' },
+  stakes: { alignItems: 'center', gap: 4 },
   pts: { backgroundColor: 'rgba(255,255,255,0.22)', borderRadius: 14, paddingVertical: 6, paddingHorizontal: 14 },
   ptsText: { fontSize: 26, color: '#fff' },
+  risk: { fontSize: 11.5, color: 'rgba(255,255,255,0.82)' },
 });

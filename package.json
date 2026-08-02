@@ -7,7 +7,10 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint:questions": "node scripts/lint-questions.js",
+    "migrate:questions": "node scripts/migrate-questions.js",
+    "check": "npm run typecheck && npm run lint:questions"
   },
   "dependencies": {
     "@expo-google-fonts/fredoka": "^0.2.3",

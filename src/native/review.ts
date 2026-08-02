@@ -1,29 +1,33 @@
 import * as StoreReview from 'expo-store-review';
 
-// In-app review pacing: prompt at most once every other day (48h), and only
-// at a natural moment (right after finishing a round). Returns the new
-// lastReviewRequest timestamp if a prompt was shown, otherwise undefined.
-
-const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
-
-export function isReviewDue(lastReviewRequest: number | undefined, now = Date.now()): boolean {
-  if (!lastReviewRequest) return true;
-  return now - lastReviewRequest >= TWO_DAYS_MS;
+/**
+ * Thin wrapper over the native in-app review prompt.
+ *
+ * All the "should we ask" policy lives in src/game/rating.ts - this file only
+ * knows how to ask. Keeping them apart means the placement rules stay testable
+ * without a device, since StoreReview no-ops everywhere except a real build.
+ */
+export async function requestNativeReview(): Promise<boolean> {
+  try {
+    if (!(await StoreReview.isAvailableAsync())) return false;
+    // hasAction() is false when there is no store to point at (Expo Go, some
+    // sideloaded builds), in which case requesting would be a silent no-op.
+    if (!(await StoreReview.hasAction())) return false;
+    await StoreReview.requestReview();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-export async function maybeRequestReview(
-  lastReviewRequest: number | undefined,
-): Promise<number | undefined> {
+/** Store listing to open when someone wants to leave a review by hand. */
+export async function openStoreListing(): Promise<void> {
   try {
-    if (!isReviewDue(lastReviewRequest)) return undefined;
-    const available = await StoreReview.isAvailableAsync();
-    if (!available) return undefined;
-    const hasAction = await StoreReview.hasAction();
-    if (!hasAction) return undefined;
-
-    await StoreReview.requestReview();
-    return Date.now();
+    const url = await StoreReview.storeUrl();
+    if (!url) return;
+    const { Linking } = await import('react-native');
+    await Linking.openURL(url);
   } catch {
-    return undefined;
+    // nothing to do - the caller already thanked them
   }
 }

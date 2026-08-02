@@ -10,6 +10,7 @@ import Txt from '../components/Txt';
 import { MODES } from '../data/game';
 import { GameApi } from '../game/useGame';
 import { C } from '../theme';
+import RatingSheet from './sheets/RatingSheet';
 
 const DOTS = [
   { top: 26, left: 30, size: 15, r: 50, color: '#ff4d6d' },
@@ -49,10 +50,11 @@ function StatCard({ emoji, value, label, bg, sh, valueColor, labelColor }: StatC
 }
 
 export default function SummaryScreen({ game }: { game: GameApi }) {
-  const { state, begin, selectMode, goHome } = game;
+  const { state, begin, selectMode, goHome, shareDailyResult } = game;
   const insets = useSafeAreaInsets();
   const s = state;
   const mode = MODES[s.mode!];
+  const isDaily = s.mode === 'daily' && s.dailyPattern.length > 0;
   const accent = mode.accent;
   const accentSh = mode.sh;
   const bottomClearance = Math.max(insets.bottom, 64);
@@ -129,6 +131,17 @@ export default function SummaryScreen({ game }: { game: GameApi }) {
           <StatCard emoji="🪙" value={`+${s.summaryCoins}`} label="Coins earned" bg={['#fff6e0', '#ffecbd']} sh="#ffdd9a" valueColor="#e8890b" labelColor="#b58026" />
         </View>
 
+        {s.freezeUsed ? (
+          <Raised radius={20} depth={5} shadowColor="#bce5f6" gradient={['#e8f7fe', '#d1edfb']} style={styles.badgeBox}>
+            <Txt w={700} style={[styles.badgeHead, { color: '#1389b6' }]}>
+              ❄ STREAK FREEZE USED
+            </Txt>
+            <Txt w={500} style={{ fontSize: 13, color: '#3f93b3', lineHeight: 18 }}>
+              You missed a day, but your {s.P.dayStreak} day streak survived.
+            </Txt>
+          </Raised>
+        ) : null}
+
         {s.newBadges.length > 0 ? (
           <Raised radius={20} depth={5} shadowColor="#ffdd9a" gradient={['#fff7e2', '#ffeec0']} style={styles.badgeBox}>
             <Txt w={700} style={styles.badgeHead}>
@@ -159,6 +172,11 @@ export default function SummaryScreen({ game }: { game: GameApi }) {
       </ScrollView>
 
       <View style={[styles.actionDock, { paddingBottom: bottomClearance }]}>
+        {/* The Daily is the same ten questions for everyone, which is what
+            makes a spoiler-free result card shareable at all. */}
+        {isDaily ? (
+          <PrimaryButton label="Share result" accent="#0fa066" accentSh="#0c8052" onPress={shareDailyResult} />
+        ) : null}
         <PrimaryButton label="Play Again ▶" accent={accent} accentSh={accentSh} onPress={playAgain} />
         <Card onPress={goHome} radius={20} depth={4} shadowColor={C.lineDeep} borderColor={C.lineDeep} style={styles.secondary}>
           <Txt w={600} style={styles.secondaryText}>
@@ -166,6 +184,16 @@ export default function SummaryScreen({ game }: { game: GameApi }) {
           </Txt>
         </Card>
       </View>
+
+      {/* Placed here rather than mid-round: the score has landed, the player is
+          at a natural stopping point, and rating.ts has already checked this
+          was a good round. */}
+      {s.showRatingAsk ? (
+        <>
+          <View style={styles.dim} />
+          <RatingSheet game={game} />
+        </>
+      ) : null}
     </View>
   );
 }
@@ -211,4 +239,5 @@ const styles = StyleSheet.create({
   },
   secondary: { paddingVertical: 14, alignItems: 'center' },
   secondaryText: { fontSize: 16, color: '#6b6584' },
+  dim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(28,20,48,0.42)', zIndex: 50 },
 });

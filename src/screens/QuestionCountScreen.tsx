@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Raised from '../components/Raised';
 import ScreenBackdrop from '../components/ScreenBackdrop';
 import Txt from '../components/Txt';
-import { MODES } from '../data/game';
+import { getQuestionsForMode, MODES } from '../data/game';
 import { GameApi } from '../game/useGame';
 import { C } from '../theme';
 
@@ -18,6 +18,14 @@ export default function QuestionCountScreen({ game }: { game: GameApi }) {
   const category = state.category;
 
   if (!mode || !state.mode) return null;
+
+  // Only offer lengths the pool can actually deliver. Trap has 55 questions, so
+  // offering "100 questions" and quietly serving 55 is a broken promise.
+  const available = getQuestionsForMode(state.mode, category).length;
+  const counts: number[] = QUESTION_COUNTS.filter((n) => n <= available);
+  if (counts.length < QUESTION_COUNTS.length && available > (counts[counts.length - 1] ?? 0)) {
+    counts.push(available);
+  }
 
   // Category-driven modes (Classic) came from the category picker; count-only
   // modes (Truth or Lie, Trap, Beat the Crowd) came straight from home.
@@ -45,7 +53,7 @@ export default function QuestionCountScreen({ game }: { game: GameApi }) {
         </View>
 
         <View style={styles.grid}>
-          {QUESTION_COUNTS.map((count) => (
+          {counts.map((count) => (
             <View key={count} style={{ width: '48%' }}>
               <Raised
                 onPress={() => begin(state.mode!, category, count)}

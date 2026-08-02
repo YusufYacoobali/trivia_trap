@@ -1,22 +1,33 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { MODES } from '../data/game';
-import { Badge, ModeId, Question } from '../data/types';
+import { Badge, ModeId, Question, ShopItem } from '../data/types';
 import { resultHaptic, tapHaptic } from '../native/haptics';
 import { syncPlayReminders } from '../native/notifications';
-import { maybeRequestReview } from '../native/review';
+import { requestNativeReview } from '../native/review';
 import { playSound } from '../native/sound';
-import { buildQueue, crowdBucketOf, pointsForAnswer, shuffle } from './logic';
+import { buildQueue, crowdBucketOf, isSpeedBonus, pointsForAnswer, shuffle } from './logic';
 import { applyRoundProgress } from './progress';
 import {
+  canRequestNative,
+  recordNativeShown,
+  recordSoftAskAnswer,
+  recordSoftAskShown,
+  RoundOutcome,
+  shouldSoftAsk,
+} from './rating';
+import { shareDaily } from './share';
+import {
   defaultProfile,
+  Inventory,
   loadProfile,
   Profile,
   saveProfile,
   Settings,
+  todayKey,
 } from './storage';
 
-export type Screen = 'home' | 'category' | 'questionCount' | 'question' | 'summary' | 'profile' | 'settings';
+export type Screen = 'home' | 'category' | 'questionCount' | 'question' | 'summary' | 'profile' | 'settings' | 'shop';
 export type Phase = 'answer' | 'confidence' | 'crowd' | 'reveal';
 
 export interface Confetti {
@@ -28,6 +39,9 @@ export interface Confetti {
   col: string;
   rot: number;
 }
+
+/** Free hints topped up to this floor once a day. */
+const HINT_FLOOR: Inventory = { fifty: 2, crowd: 2, skip: 1, freeze: 0 };
 
 export interface GameState {
   screen: Screen;
@@ -47,13 +61,23 @@ export interface GameState {
   bestRun: number;
   eliminated: number[];
   showCrowdHint: boolean;
-  hints: { fifty: number; crowd: number; skip: number };
   timeLeft: number;
+  /** Set when the clock ran out rather than the player answering. */
+  timedOut: boolean;
+  /** Whether the last answer landed inside the speed-bonus window. */
+  lastSpeedBonus: boolean;
+  /** Consecutive speed-bonus answers, for the Quick Draw badge. */
+  speedRun: number;
   lastWrong: boolean;
   crowdRight: boolean;
   newBadges: Badge[];
   lastEarned: number;
   summaryCoins: number;
+  /** '1'/'0' per question, for the spoiler-free Daily share card. */
+  dailyPattern: string;
+  freezeUsed: boolean;
+  /** Soft review ask, shown over the Summary screen. */
+  showRatingAsk: boolean;
   sessionFlags: Record<string, boolean>;
   resetArmed: boolean;
   loaded: boolean;
@@ -93,13 +117,18 @@ function initialState(): GameState {
     bestRun: 0,
     eliminated: [],
     showCrowdHint: false,
-    hints: { fifty: 2, crowd: 2, skip: 1 },
-    timeLeft: 60,
+    timeLeft: 30,
+    timedOut: false,
+    lastSpeedBonus: false,
+    speedRun: 0,
     lastWrong: false,
     crowdRight: false,
     newBadges: [],
     lastEarned: 0,
     summaryCoins: 0,
+    dailyPattern: '',
+    freezeUsed: false,
+    showRatingAsk: false,
     sessionFlags: {},
     resetArmed: false,
     loaded: false,
@@ -123,7 +152,11 @@ export interface GameApi {
   goHome: () => void;
   goProfile: () => void;
   goSettings: () => void;
+  goShop: () => void;
   useHint: (type: 'fifty' | 'crowd' | 'skip') => void;
+  buyItem: (item: ShopItem) => void;
+  shareDailyResult: () => void;
+  answerRatingAsk: (positive: boolean) => void;
   toggleSetting: (k: keyof Settings) => void;
   resetProgress: () => void;
 }
@@ -136,6 +169,9 @@ export function useGame(): GameApi {
   const confettiRef = useRef<Confetti[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ratingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** When the current round started, for play-time accounting. */
+  const playStartRef = useRef<number | null>(null);
 
   // Helper mirroring the mockup's setState(partial) ergonomics. We update the
   // ref synchronously (before scheduling the render) so that actions which
@@ -169,6 +205,7 @@ export function useGame(): GameApi {
       mounted = false;
       clearTimer();
       if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+      if (ratingTimeoutRef.current) clearTimeout(ratingTimeoutRef.current);
     };
   }, [patch, clearTimer]);
 
@@ -181,62 +218,102 @@ export function useGame(): GameApi {
     return s.queue[s.qIndex];
   }, []);
 
+  /** Milliseconds spent in the round that is ending, for the review gate. */
+  const drainPlayTime = useCallback((): number => {
+    if (playStartRef.current === null) return 0;
+    const elapsed = Date.now() - playStartRef.current;
+    playStartRef.current = null;
+    return Math.max(0, elapsed);
+  }, []);
+
   const endGame = useCallback(() => {
     clearTimer();
     const s = stateRef.current;
-    const { profile, newBadges, earnedCoins } = applyRoundProgress(s);
+    const elapsed = drainPlayTime();
+
+    const withPlayTime: GameState = { ...s, P: { ...s.P, playMs: s.P.playMs + elapsed } };
+    const { profile, newBadges, earnedCoins, freezeUsed } = applyRoundProgress(withPlayTime);
 
     persist(profile);
-    patch({ screen: 'summary', P: profile, newBadges, summaryCoins: earnedCoins });
-
-    // Ask for a store review at a natural moment, paced to every other day.
-    resetTimeoutRef.current = setTimeout(async () => {
-      const ts = await maybeRequestReview(stateRef.current.P.lastReviewRequest);
-      if (ts) {
-        const updated = { ...stateRef.current.P, lastReviewRequest: ts };
-        persist(updated);
-        patch({ P: updated });
-      }
-    }, 900);
-  }, [clearTimer, patch, persist]);
-
-  const reveal = useCallback(() => {
-    const s = stateRef.current;
-    const q = s.queue[s.qIndex];
-    if (!q) return;
-    const mode = s.mode as ModeId;
-    const m = MODES[mode];
-    const isC = s.selected === q.a;
-    let crowdRight = false;
-    if (m.crowd) {
-      const bucket = crowdBucketOf(q.c);
-      crowdRight = s.crowdGuess === bucket;
-    }
-    const pts = pointsForAnswer(mode, isC, s.confidence, crowdRight);
-    const run = isC ? s.run + 1 : 0;
-    const flags = { ...s.sessionFlags };
-    if (isC && s.confidence === 3) flags.locked = true;
-    if (isC && q.kind === 'trap') flags.trapper = true;
-    if (crowdRight) flags.crowd = true;
-    if (run >= 5) flags.streak5 = true;
-
-    confettiRef.current = isC ? genConfetti() : [];
-    resultHaptic(s.P.settings.haptics, isC);
-    playSound(s.P.settings.sound, isC ? 'correct' : 'wrong');
-
     patch({
-      phase: 'reveal',
-      lastEarned: pts,
-      score: s.score + pts,
-      correct: s.correct + (isC ? 1 : 0),
-      total: s.total + 1,
-      run,
-      bestRun: Math.max(s.bestRun, run),
-      lastWrong: !isC,
-      crowdRight,
-      sessionFlags: flags,
+      screen: 'summary',
+      P: profile,
+      newBadges,
+      summaryCoins: earnedCoins,
+      freezeUsed,
+      showRatingAsk: false,
     });
-  }, [patch]);
+
+    // Review ask, placed after the score has landed rather than on top of it.
+    const outcome: RoundOutcome = {
+      accuracy: s.total ? s.correct / s.total : 0,
+      perfect: s.total > 0 && s.correct === s.total,
+      newBadgeCount: newBadges.length,
+      endedInFailure: Boolean((MODES[s.mode as ModeId]?.endless || MODES[s.mode as ModeId]?.rush) && s.lastWrong),
+    };
+    if (shouldSoftAsk(profile, outcome)) {
+      ratingTimeoutRef.current = setTimeout(() => {
+        const updated = { ...stateRef.current.P, rating: recordSoftAskShown(stateRef.current.P.rating) };
+        persist(updated);
+        patch({ P: updated, showRatingAsk: true });
+      }, 1100);
+    }
+  }, [clearTimer, drainPlayTime, patch, persist]);
+
+  const reveal = useCallback(
+    (options: { timedOut?: boolean } = {}) => {
+      const s = stateRef.current;
+      const q = s.queue[s.qIndex];
+      if (!q) return;
+      const mode = s.mode as ModeId;
+      const m = MODES[mode];
+      const isC = !options.timedOut && s.selected === q.a;
+
+      let crowdRight = false;
+      if (m.crowd) crowdRight = s.crowdGuess === crowdBucketOf(q.c);
+
+      const speedBonus = isC && !options.timedOut && isSpeedBonus(s.timeLeft, m.secondsPerQuestion);
+      const pts = pointsForAnswer({
+        mode,
+        correct: isC,
+        confidence: options.timedOut ? null : s.confidence,
+        crowdBonus: crowdRight,
+        speedBonus,
+      });
+
+      const run = isC ? s.run + 1 : 0;
+      const speedRun = speedBonus ? s.speedRun + 1 : 0;
+      const flags = { ...s.sessionFlags };
+      if (isC && s.confidence === 3) flags.locked = true;
+      if (isC && s.confidence === 3 && q.d >= 5) flags.nerve = true;
+      if (isC && q.kind === 'trap') flags.trapper = true;
+      if (crowdRight) flags.crowd = true;
+      if (run >= 5) flags.streak5 = true;
+      if (speedRun >= 5) flags.quick = true;
+
+      confettiRef.current = isC ? genConfetti() : [];
+      resultHaptic(s.P.settings.haptics, isC);
+      playSound(s.P.settings.sound, isC ? 'correct' : 'wrong');
+
+      patch({
+        phase: 'reveal',
+        lastEarned: pts,
+        score: s.score + pts,
+        correct: s.correct + (isC ? 1 : 0),
+        total: s.total + 1,
+        run,
+        bestRun: Math.max(s.bestRun, run),
+        lastWrong: !isC,
+        timedOut: Boolean(options.timedOut),
+        lastSpeedBonus: speedBonus,
+        speedRun,
+        crowdRight,
+        sessionFlags: flags,
+        dailyPattern: s.mode === 'daily' ? s.dailyPattern + (isC ? '1' : '0') : s.dailyPattern,
+      });
+    },
+    [patch],
+  );
 
   const tick = useCallback(() => {
     const s = stateRef.current;
@@ -247,18 +324,47 @@ export function useGame(): GameApi {
     if (s.timeLeft <= 1) {
       clearTimer();
       patch({ timeLeft: 0 });
-      endGame();
+      // Running out is a wrong answer, not an instant game over - except in
+      // the survival modes, where `next` will end the run on lastWrong.
+      reveal({ timedOut: true });
       return;
     }
     patch((st) => ({ timeLeft: st.timeLeft - 1 }));
-  }, [clearTimer, endGame, patch]);
+  }, [clearTimer, patch, reveal]);
+
+  const startTimer = useCallback(() => {
+    clearTimer();
+    timerRef.current = setInterval(() => tick(), 1000);
+  }, [clearTimer, tick]);
+
+  /** Free daily hint top-up so a player without coins is never stuck. */
+  const refillHints = useCallback((P: Profile): Profile => {
+    const today = todayKey();
+    if (P.hintRefillDate === today) return P;
+    return {
+      ...P,
+      hintRefillDate: today,
+      inventory: {
+        ...P.inventory,
+        fifty: Math.max(P.inventory.fifty, HINT_FLOOR.fifty),
+        crowd: Math.max(P.inventory.crowd, HINT_FLOOR.crowd),
+        skip: Math.max(P.inventory.skip, HINT_FLOOR.skip),
+      },
+    };
+  }, []);
 
   const begin = useCallback(
     (mode: ModeId, cat: string | null, questionLimit?: number | null) => {
       clearTimer();
-      const queue = buildQueue(mode, cat, questionLimit);
+      const s = stateRef.current;
+      const P = refillHints(s.P);
+      if (P !== s.P) persist(P);
+
+      const queue = buildQueue(mode, cat, questionLimit, P);
       const m = MODES[mode];
       confettiRef.current = [];
+      playStartRef.current = Date.now();
+
       patch({
         screen: 'question',
         mode,
@@ -277,18 +383,23 @@ export function useGame(): GameApi {
         bestRun: 0,
         eliminated: [],
         showCrowdHint: false,
-        hints: { fifty: 2, crowd: 2, skip: 1 },
-        timeLeft: m.secondsPerQuestion ?? 60,
+        timeLeft: m.secondsPerQuestion ?? 30,
+        timedOut: false,
+        lastSpeedBonus: false,
+        speedRun: 0,
         lastWrong: false,
         newBadges: [],
         lastEarned: 0,
+        dailyPattern: '',
+        freezeUsed: false,
+        showRatingAsk: false,
         sessionFlags: {},
+        P,
       });
-      if (m.rush) {
-        timerRef.current = setInterval(() => tick(), 1000);
-      }
+      // Every mode has a clock now, not just Rush.
+      startTimer();
     },
-    [clearTimer, patch, tick],
+    [clearTimer, patch, persist, refillHints, startTimer],
   );
 
   const selectMode = useCallback(
@@ -327,6 +438,8 @@ export function useGame(): GameApi {
       if (s.phase !== 'answer') return;
       if (s.eliminated.indexOf(i) >= 0) return;
       tapHaptic(s.P.settings.haptics);
+      // The clock freezes here: `tick` only counts down during 'answer', so the
+      // confidence bet is not a speed round.
       patch({ selected: i, phase: 'confidence' });
     },
     [patch],
@@ -362,17 +475,17 @@ export function useGame(): GameApi {
   const next = useCallback(() => {
     const s = stateRef.current;
     const m = MODES[s.mode as ModeId];
-    // Survival modes (Streak Run, Category Rush) end the moment you miss one.
+    // Survival modes end the moment you miss one - including on a timeout.
     if ((m.endless || m.rush) && s.lastWrong) {
       endGame();
       return;
     }
-    let qi = s.qIndex + 1;
+    const qi = s.qIndex + 1;
     let queue = s.queue;
     if (qi >= queue.length) {
-      if (m.rush) {
-        // Rush never ends by running out of questions; keep refilling the queue.
-        queue = queue.concat(shuffle(buildQueue(s.mode as ModeId, s.category)));
+      if (m.rush || m.endless) {
+        // Survival modes never end by running out; keep refilling the queue.
+        queue = queue.concat(shuffle(buildQueue(s.mode as ModeId, s.category, null, s.P)));
       } else {
         endGame();
         return;
@@ -387,15 +500,23 @@ export function useGame(): GameApi {
       crowdGuess: null,
       eliminated: [],
       showCrowdHint: false,
-      // Reset the per-question clock for the next Rush question.
-      ...(m.secondsPerQuestion ? { timeLeft: m.secondsPerQuestion } : null),
+      timedOut: false,
+      timeLeft: m.secondsPerQuestion ?? 30,
     });
-  }, [endGame, patch]);
+    startTimer();
+  }, [endGame, patch, startTimer]);
 
   const quit = useCallback(() => {
     clearTimer();
+    const elapsed = drainPlayTime();
+    if (elapsed > 0) {
+      const P = { ...stateRef.current.P, playMs: stateRef.current.P.playMs + elapsed };
+      persist(P);
+      patch({ screen: 'home', P });
+      return;
+    }
     patch({ screen: 'home' });
-  }, [clearTimer, patch]);
+  }, [clearTimer, drainPlayTime, patch, persist]);
 
   const goHome = useCallback(() => {
     clearTimer();
@@ -404,29 +525,102 @@ export function useGame(): GameApi {
 
   const goProfile = useCallback(() => patch({ screen: 'profile' }), [patch]);
   const goSettings = useCallback(() => patch({ screen: 'settings' }), [patch]);
+  const goShop = useCallback(() => patch({ screen: 'shop' }), [patch]);
 
   const useHint = useCallback(
     (type: 'fifty' | 'crowd' | 'skip') => {
       const s = stateRef.current;
       if (s.phase !== 'answer') return;
+      if (s.P.inventory[type] <= 0) return;
+      // Beat the Crowd scores you on guessing the crowd's hit rate, so a hint
+      // that shows you the crowd's answers is selling you the answer. Worse,
+      // the displayed share is jittered while scoring uses the raw number, so
+      // on ~14% of questions the hint would actively push you into the wrong
+      // bucket. The hint is hidden in this mode; this is the belt-and-braces.
+      if (type === 'crowd' && MODES[s.mode as ModeId].crowd) return;
+
+      // Hints are consumables now, so spending one persists immediately.
+      const P: Profile = { ...s.P, inventory: { ...s.P.inventory, [type]: s.P.inventory[type] - 1 } };
+      persist(P);
+
       if (type === 'fifty') {
-        if (s.hints.fifty <= 0) return;
         const q = s.queue[s.qIndex];
         const wrong = [0, 1, 2, 3].filter((i) => i !== q.a);
-        const rm = shuffle(wrong).slice(0, 2);
-        patch({ eliminated: rm, hints: { ...s.hints, fifty: s.hints.fifty - 1 } });
+        patch({ eliminated: shuffle(wrong).slice(0, 2), P });
+        return;
       }
       if (type === 'crowd') {
-        if (s.hints.crowd <= 0) return;
-        patch({ showCrowdHint: true, hints: { ...s.hints, crowd: s.hints.crowd - 1 } });
+        patch({ showCrowdHint: true, P });
+        return;
       }
-      if (type === 'skip') {
-        if (s.hints.skip <= 0) return;
-        patch({ hints: { ...s.hints, skip: s.hints.skip - 1 }, total: s.total + 1 });
-        next();
+      // Skip counts as an answered question but costs nothing.
+      patch({ P, total: s.total + 1, dailyPattern: s.mode === 'daily' ? `${s.dailyPattern}0` : s.dailyPattern });
+      next();
+    },
+    [next, patch, persist],
+  );
+
+  const buyItem = useCallback(
+    (item: ShopItem) => {
+      const s = stateRef.current;
+      if (s.P.coins < item.cost) return;
+      if (item.kind === 'theme' && s.P.owned.indexOf(item.id) >= 0) return;
+
+      const P: Profile = {
+        ...s.P,
+        coins: s.P.coins - item.cost,
+        inventory: { ...s.P.inventory },
+        owned: [...s.P.owned],
+      };
+
+      if (item.kind === 'hint') {
+        const key = item.id.replace('pack-', '') as keyof Inventory;
+        P.inventory[key] += item.grants ?? 1;
+      } else if (item.kind === 'freeze') {
+        P.inventory.freeze += item.grants ?? 1;
+      } else {
+        P.owned.push(item.id);
+        P.theme = item.id;
+      }
+
+      tapHaptic(s.P.settings.haptics);
+      persist(P);
+      patch({ P });
+    },
+    [patch, persist],
+  );
+
+  const shareDailyResult = useCallback(() => {
+    const s = stateRef.current;
+    if (!s.dailyPattern) return;
+    void shareDaily({
+      dateKey: todayKey(),
+      pattern: s.dailyPattern,
+      score: Math.max(0, s.score),
+      dayStreak: s.P.dayStreak,
+    });
+  }, []);
+
+  const answerRatingAsk = useCallback(
+    (positive: boolean) => {
+      const s = stateRef.current;
+      const rating = recordSoftAskAnswer(s.P.rating, positive);
+      const P: Profile = { ...s.P, rating };
+      persist(P);
+      patch({ P, showRatingAsk: false });
+
+      // Only a happy player gets to spend one of the very limited native prompts.
+      if (positive && canRequestNative(rating)) {
+        void (async () => {
+          const shown = await requestNativeReview();
+          if (!shown) return;
+          const updated = { ...stateRef.current.P, rating: recordNativeShown(stateRef.current.P.rating) };
+          persist(updated);
+          patch({ P: updated });
+        })();
       }
     },
-    [next, patch],
+    [patch, persist],
   );
 
   const toggleSetting = useCallback(
@@ -459,6 +653,9 @@ export function useGame(): GameApi {
     const fresh: Profile = {
       ...defaultProfile(),
       settings: s.P.settings,
+      // Asking again after a reset would be nagging, so the answer sticks.
+      rating: s.P.rating,
+      firstOpenAt: s.P.firstOpenAt,
     };
     persist(fresh);
     patch({ P: fresh, resetArmed: false });
@@ -480,7 +677,11 @@ export function useGame(): GameApi {
     goHome,
     goProfile,
     goSettings,
+    goShop,
     useHint,
+    buyItem,
+    shareDailyResult,
+    answerRatingAsk,
     toggleSetting,
     resetProgress,
   };

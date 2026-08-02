@@ -1,0 +1,25 @@
+name: checks
+
+on:
+  push:
+    branches: [main, v2]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # migrate-questions.js reads the pre-v2 bank out of history, so a
+          # shallow clone would break `npm run migrate:questions`.
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Question bank
+        run: npm run lint:questions
