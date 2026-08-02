@@ -17,14 +17,26 @@ import { Question } from './types';
 // nothing to pattern-match on, and the distractors are freshly invented rather
 // than borrowed from the myth canon.
 //
-// Stems rotate through STEMS below so no single phrasing dominates.
+// Stems rotate through the set below so no single phrasing dominates.
+//
+// VERIFICATION: every claim here was reviewed, and the ones that were surprising
+// rather than settled were checked against sources on the web. That pass caught
+// two of my own errors:
+//
+//   tl25  claimed Nintendo predated the Eiffel Tower. It does not - the tower
+//         opened March 1889, Nintendo was founded September 1889.
+//   tl46  claimed "set" has the most dictionary definitions. "Run" has since
+//         overtaken it on sense count; "set" keeps only the longest entry.
+//
+// Both are now corrected and carry a `source`. Anything a search could not
+// settle was removed rather than shipped.
 
 const V = '2026-08-02';
 
 export const TRUTHLIE_QUESTIONS: Question[] = [
   // --- animals ---
   { id: 'tl1', cat: 'Truth or Lie', kind: 'truthlie', d: 3, q: 'Only one of these is true. Which?', o: ['Octopuses have three hearts', 'Octopuses have three brains', 'Octopuses have three stomachs', 'Octopuses have three eyes'], a: 0, e: 'Two hearts pump blood to the gills and one pumps it to the rest of the body.', hook: 'The main heart stops beating when an octopus swims, which is why they prefer crawling.', c: 52, tags: ['marine'], verifiedAt: V },
-  { id: 'tl2', cat: 'Truth or Lie', kind: 'truthlie', d: 4, q: 'Three of these are made up. Which one is real?', o: ['Sloths can hold their breath longer than dolphins', 'Sloths sleep more hours per day than any mammal', 'Sloths cannot survive a fall from their tree', 'Sloths have no fingernails, only claws'], a: 0, e: 'Sloths can slow their heart rate and stay under for around 40 minutes; dolphins typically manage about 10.', c: 34, tags: ['mammals'], verifiedAt: V },
+  { id: 'tl2', cat: 'Truth or Lie', kind: 'truthlie', d: 4, q: 'Three of these are made up. Which one is real?', o: ['Sloths can hold their breath longer than dolphins', 'Sloths sleep more hours per day than any mammal', 'Sloths cannot survive a fall from their tree', 'Sloths have no fingernails, only claws'], a: 0, e: 'Sloths can slow their heart rate and stay under for around 40 minutes; dolphins typically manage 10 to 15.', c: 34, tags: ['mammals'], verifiedAt: V },
   { id: 'tl3', cat: 'Truth or Lie', kind: 'truthlie', d: 3, q: 'Spot the genuine fact:', o: ['Butterflies taste with their feet', 'Butterflies taste with their wings', 'Butterflies taste with their eyes', 'Butterflies cannot taste at all'], a: 0, e: 'Chemical receptors on their feet let a butterfly identify a plant just by standing on it.', c: 50, tags: ['insects'], verifiedAt: V },
   { id: 'tl4', cat: 'Truth or Lie', kind: 'truthlie', d: 4, q: 'One of these actually checks out. Which?', o: ['Starfish have no brain at all', 'Starfish have nine small brains', 'Starfish have a brain in each arm', 'Starfish have a brain but no heart'], a: 0, e: 'Starfish run on a nerve ring and radial nerves, with no centralised brain.', c: 41, tags: ['marine'], verifiedAt: V },
   { id: 'tl5', cat: 'Truth or Lie', kind: 'truthlie', d: 4, q: 'Three of these are false. Find the true one.', o: ['Elephants cannot jump', 'Elephants cannot swim', 'Elephants cannot walk backwards', 'Elephants cannot lie down'], a: 0, e: 'Their leg structure and weight mean all four feet never leave the ground at once. They swim well.', c: 38, tags: ['mammals'], verifiedAt: V },
@@ -51,7 +63,12 @@ export const TRUTHLIE_QUESTIONS: Question[] = [
   { id: 'tl22', cat: 'Truth or Lie', kind: 'truthlie', d: 4, q: 'Three of these are false. Find the true one.', o: ['Cleopatra lived closer to the Moon landing than to the Great Pyramid', 'Cleopatra lived closer to the Great Pyramid than to the Moon landing', 'Cleopatra was alive when the Great Pyramid was built', 'Cleopatra was born the year the Great Pyramid was finished'], a: 0, e: 'The Great Pyramid was already about 2,500 years old in Cleopatra\'s lifetime. The Moon landing was under 2,000 years later.', c: 36, tags: ['timeline'], verifiedAt: V },
   { id: 'tl23', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'Which claim would survive fact-checking?', o: ['Oxford University is older than the Aztec Empire', 'Oxford University is older than the Roman Empire', 'Oxford University is older than the Great Wall', 'Oxford University is older than the pyramids'], a: 0, e: 'Teaching at Oxford dates from 1096; the Aztec Empire was founded in 1428.', c: 30, tags: ['timeline'], verifiedAt: V },
   { id: 'tl24', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'One of these actually checks out. Which?', o: ['The fax machine predates the American Civil War', 'The telephone predates the American Civil War', 'The lightbulb predates the American Civil War', 'The radio predates the American Civil War'], a: 0, e: 'Alexander Bain patented a fax-like device in 1843, nearly two decades before the war.', c: 24, tags: ['timeline', 'invention'], verifiedAt: V },
-  { id: 'tl25', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'Spot the genuine fact:', o: ['Nintendo was founded before the Eiffel Tower opened', 'Nintendo was founded before the American Civil War', 'Nintendo was founded before the French Revolution', 'Nintendo was founded after the Second World War'], a: 0, e: 'Nintendo began as a playing-card company in 1889; the Eiffel Tower opened later that same year.', c: 26, tags: ['timeline'], verifiedAt: V },
+  // Corrected during the web-verification pass: this originally claimed Nintendo
+  // was founded BEFORE the Eiffel Tower opened. It was the other way round - the
+  // tower opened 31 March 1889, Nintendo was founded 23 September 1889. The
+  // same-year coincidence is the genuinely surprising part, so the claim now
+  // says that instead.
+  { id: 'tl25', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'Spot the genuine fact:', o: ['Nintendo was founded the same year the Eiffel Tower opened', 'Nintendo was founded the same year as the Ford Motor Company', 'Nintendo was founded the same year as the first modern Olympics', 'Nintendo was founded the same year as the first powered flight'], a: 0, e: 'Nintendo began as a playing-card maker in Kyoto in September 1889. The Eiffel Tower had opened that March.', c: 26, tags: ['timeline'], source: 'Nintendo company history; Eiffel Tower opening date 31 March 1889', verifiedAt: V },
   { id: 'tl26', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'Pick the one that is actually true:', o: ['Harvard was founded before calculus was invented', 'Harvard was founded before the printing press', 'Harvard was founded before Shakespeare was born', 'Harvard was founded before Columbus sailed'], a: 0, e: 'Harvard was founded in 1636; Newton and Leibniz developed calculus decades later.', c: 28, tags: ['timeline'], verifiedAt: V },
   { id: 'tl27', cat: 'Truth or Lie', kind: 'truthlie', d: 4, q: 'Only one of these is true. Which?', o: ['The Hundred Years War lasted 116 years', 'The Hundred Years War lasted exactly 100 years', 'The Hundred Years War lasted 87 years', 'The Hundred Years War lasted 140 years'], a: 0, e: 'It ran from 1337 to 1453 - 116 years, in a series of on-and-off conflicts.', c: 38, tags: ['medieval'], verifiedAt: V },
   { id: 'tl28', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'Three of these are made up. Which one is real?', o: ['France last used the guillotine in the 1970s', 'France last used the guillotine in the 1870s', 'France last used the guillotine in the 1930s', 'France last used the guillotine in the 1790s'], a: 0, e: 'The last guillotine execution in France was in 1977, the year Star Wars opened.', c: 22, tags: ['timeline'], verifiedAt: V },
@@ -78,7 +95,10 @@ export const TRUTHLIE_QUESTIONS: Question[] = [
   // --- language and words ---
   { id: 'tl44', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'One of these actually checks out. Which?', o: ['"Bookkeeper" has three consecutive double letters', '"Bookkeeper" has four consecutive double letters', '"Balloonist" has three consecutive double letters', 'No English word has consecutive double letters'], a: 0, e: 'Bookkeeper contains oo, kk and ee back to back.', c: 28, tags: ['words'], verifiedAt: V },
   { id: 'tl45', cat: 'Truth or Lie', kind: 'truthlie', d: 4, q: 'Pick the one that is actually true:', o: ['"Typewriter" can be typed on one keyboard row', '"Keyboard" can be typed on one keyboard row', '"Alphabet" can be typed on one keyboard row', 'No long word fits on one keyboard row'], a: 0, e: 'Every letter in "typewriter" sits on the top row of a QWERTY keyboard.', c: 41, tags: ['words'], verifiedAt: V },
-  { id: 'tl46', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'Three of these are made up. Which one is real?', o: ['"Set" has more dictionary definitions than any word', '"Go" has more dictionary definitions than any word', '"Time" has more dictionary definitions than any word', 'All English words have similar definition counts'], a: 0, e: 'The Oxford English Dictionary gives "set" the longest entry of any word.', c: 30, tags: ['words'], verifiedAt: V },
+  // Narrowed during the web-verification pass: "set" is often quoted as having
+  // the most definitions, but "run" has since overtaken it on sense count. What
+  // "set" still holds outright is the longest ENTRY, so the claim says that.
+  { id: 'tl46', cat: 'Truth or Lie', kind: 'truthlie', d: 5, q: 'Three of these are made up. Which one is real?', o: ['"Set" has the longest entry in the Oxford English Dictionary', '"Run" has the longest entry in the Oxford English Dictionary', '"Time" has the longest entry in the Oxford English Dictionary', '"Go" has the longest entry in the Oxford English Dictionary'], a: 0, e: 'The entry for "set" runs to roughly 60,000 words. "Run" overtook it on sheer number of senses, but "set" keeps the longest entry.', c: 30, tags: ['words'], source: 'Oxford English Dictionary, 2nd edition', verifiedAt: V },
 
   // --- physics, space and numbers ---
   { id: 'tl47', cat: 'Truth or Lie', kind: 'truthlie', d: 4, q: 'Only one of these is true. Which?', o: ['A shuffled deck order has probably never existed before', 'A shuffled deck repeats an old order every few games', 'A shuffled deck has only a few million orders', 'A shuffled deck always lands in a known pattern'], a: 0, e: 'There are about 8 x 10^67 possible orderings, so any thorough shuffle is almost certainly a first.', c: 40, tags: ['maths'], verifiedAt: V },

@@ -74,6 +74,7 @@ const DROP_IDS = new Set([
   'gh8',
   // Duplicate facts found by reading, not by the linter's keyword heuristic.
   's23',  // largest organ -> also tr52
+  's78',  // gas plants use to make food -> also s4
   'g25',  // Ethiopia uncolonised -> also gh3
   'g75',  // Everest range -> also g3
   'g83',  // Lesotho -> also gh6
@@ -114,9 +115,74 @@ const DISTRACTOR_REWRITES = {
   // plausibly be the answer is the entire job of a distractor.
   h50: { 'Treaty of Narnia': 'Treaty of Trianon' },
   h99: { 'Library of Atlantis': 'Library of Pergamon' },
-  s37: { Sandwich: 'Molecule' },
   w86: { Helium: 'Compressed helium gas', Oxygen: 'Pure bottled oxygen', Hydrogen: 'Hydrogen sulfide' },
+
+  // ── joke distractors found by reading all 769 questions ──────────────────
+  //
+  // The legacy author sprinkled gag options right through the bank ("DJ
+  // Rockman", "Bakery science", "A very angry pigeon"). No regex finds these -
+  // they only turn up by reading. Each one turned a 4-way question into a
+  // 2- or 3-way one, which is a large part of why the game felt too easy.
+  // The answers were all correct; only the wrong options change here.
+  h31: { 'A really old brick': 'The Behistun Inscription' },
+  h38: { 'The Mario brothers': 'The Montgolfier brothers', 'The Jonas brothers': 'The Lumiere brothers' },
+  h43: { 'Fast food menus': 'Astronomical tables', 'Football tactics': 'Medical recipes', 'Weather forecasts': 'Trade agreements' },
+  h48: { 'Emoji Latin': 'Linear B' },
+  h51: { 'French Resistance': 'Dutch Fleet' },
+  s37: { Sandwich: 'Molecule' },
+  s43: { Introverts: 'Insectivores' },
+  s44: { 'Tiny donut': 'Hollow sphere', 'Flat square': 'Flat sheet', 'Straight ladder only': 'Straight ladder' },
+  s54: { 'DJ Rockman': 'Meteorologist' },
+  s56: { 'Grow hair': 'Clot wounds' },
+  s58: { 'Time only': 'Time' },
+  s60: { 'Bakery science': 'Hydrology' },
+  s63: { 'Drama energy': 'Potential energy' },
+  s65: { 'Soup layer': 'Ionosphere' },
+  s66: { 'Spice scale': 'Kelvin scale' },
+  s67: { Slime: 'Basalt' },
+  s69: { Sponge: 'Resistor' },
+  s72: { 'Store memories': 'Regulate temperature' },
+  s78: { 'Nitrogen only': 'Nitrogen' },
+  s80: { Confused: 'Variable' },
+  s87: { Splash: 'Amplitude' },
+  s90: { 'Make roots blue': 'Store starch', 'Store bones': 'Transport water', 'Create gravity': 'Produce nectar' },
+  // Lengthened deliberately: the correct answer here is a 43-character
+  // definition, so short distractors would hand it to you on length alone.
+  s91: {
+    'A baby volcano': 'Glass formed when lava cools very quickly',
+    'A type of cloud': 'A mineral vein deposited by groundwater',
+    'A spicy mineral': 'A layer of volcanic ash compressed into stone',
+  },
+  s92: { 'Volt only': 'Volt' },
+  s93: { Homework: 'Muscle strain' },
+  s95: { 'Mars turns off': 'The Sun cools briefly', 'The Sun blinks': 'The Moon lights up' },
+  s97: { 'Store electricity': 'Produce insulin', 'Taste food': 'Filter blood' },
+  s100: { 'Friend request': 'Hydrogen bond', 'Ionic bond only': 'Ionic bond' },
+  g65: { Egypt: 'Chile', Brazil: 'New Zealand', 'Saudi Arabia': 'Canada' },
+  f24: { 'The goalkeeper only': 'The goalkeeper' },
+  f59: { 'They get a bonus': 'They get a final warning', 'They switch teams': 'They must be substituted', 'They become captain': 'They miss the next match only' },
+  f61: { 'A washed kit': 'A match with no fouls', 'A blank tactics board': 'A match with no cards' },
+  f62: { 'Scoring from home': 'Scoring from a corner', 'A goal nobody saw': 'A goal off a deflection' },
+  f64: { 'Ball boy': 'Sweeper' },
+  f65: { 'A very angry pigeon': 'A cup final replay' },
+  f66: { 'Lunch time': 'Half time', 'Golden time': 'Golden goal', 'Bonus mode': 'Extra time' },
+  f68: { 'A kick from a bike': 'A low driven cross', 'A tackle with wheels': 'A sliding tackle' },
+  f73: { 'Long throws only': 'Long ball tactics', 'No goalkeepers': 'Man marking', 'Boot polishing': 'Zonal defending' },
+  f82: { 'Drama zone': 'Technical area' },
+  f87: { 'Until everyone is tired': 'Two 10-minute halves' },
+  m34: { 'Big Bitey Boat': 'Pequod' },
+  m51: { 'Tax forms': 'Deep water' },
+  m80: { 'The Lost World only': 'The Lost World' },
+  w52: { 'Moon traffic jams': 'Moon lightning' },
 };
+
+// Every question that survived the cull was read end to end during the v2
+// content review: the answer checked against knowledge, the distractors checked
+// for plausibility, and the wording checked for ambiguity. That is what this
+// date records. It is a careful editorial review, NOT a per-question citation -
+// anything whose answer can drift over time is additionally marked `volatile`,
+// which forces a named source and an annual re-check through the linter.
+const REVIEWED_AT = '2026-08-02';
 
 // Answers that change with the world rather than staying put.
 //
@@ -174,8 +240,8 @@ function serialise(q) {
   if (q.volatile) {
     parts.push('volatile: true');
     parts.push(`source: ${esc(q.source)}`);
-    parts.push(`verifiedAt: ${esc(q.verifiedAt)}`);
   }
+  parts.push(`verifiedAt: ${esc(q.verifiedAt)}`);
   return `  { ${parts.join(', ')} },`;
 }
 
@@ -220,7 +286,8 @@ function main() {
         d: difficultyFor(q),
         volatile: volatile || undefined,
         source: volatile ? meta.source : undefined,
-        verifiedAt: volatile ? meta.verifiedAt : undefined,
+        // Every surviving question was read during the v2 content review.
+        verifiedAt: volatile ? meta.verifiedAt : REVIEWED_AT,
       };
     });
 

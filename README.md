@@ -16,7 +16,18 @@ A trivia game built with **Expo + TypeScript + React Native**.
 
 ## The question bank
 
-769 questions across 7 categories plus Truth or Lie and Trap.
+736 questions across 7 categories plus Truth or Lie and Trap.
+
+**Every question has been through content review** — the answer checked, the
+distractors checked for plausibility, the wording checked for ambiguity. That
+review is what `verifiedAt` records, and the linter now hard-fails on any
+question missing it, so new content cannot skip the step.
+
+Claims that were surprising rather than settled — records, superlatives,
+counterintuitive science, "first ever" firsts — were additionally **checked
+against sources on the web** rather than from memory. Anything a search could
+not settle was cut rather than shipped. Answers that can drift over time are
+marked `volatile`, which forces a named `source` and an annual re-check.
 
 ```
 src/data/
@@ -52,13 +63,10 @@ Errors fail the build. It gates on:
 | `dominant-stem` | No Truth or Lie template may cover more than 25% of the mode. |
 | `thin-hard-tail` | Every category needs 6+ questions at difficulty 4+, or Hard Mode skews to whichever category has the most. |
 | `stale-volatile` | A record last checked over a year ago. |
+| `unverified` | A question with no `verifiedAt` skipped content review. |
 
 Warnings do not fail: duplicate facts, recycled distractors, fictional-place
 distractors, and per-question length gaps all need a human to judge.
-
-`unverified-debt` reports how many entries have never been individually
-fact-checked. Migrated questions deliberately carry no `verifiedAt` rather than
-a fabricated one.
 
 ### Regenerating the classic bank
 

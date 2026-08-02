@@ -17,6 +17,14 @@ import { Question } from './types';
 //   framing   the obvious anchor number is the wrong anchor
 //
 // A player who learns "read the noun, not the vibe" gets better at all of them.
+//
+// VERIFICATION: the naming traps in particular are exactly the kind of claim
+// that gets repeated wrongly, so they were checked against sources rather than
+// recalled. That pass rewrote tr3's explanation, which had repeated the "named
+// after a Mr Camel" story as fact when it is an unevidenced urban legend, and
+// removed tr54 ("a tonne of bricks vs a tonne of helium balloons"), whose
+// premise contradicted itself - "a tonne of X" already fixes the mass, so the
+// buoyancy twist made the question unanswerable rather than clever.
 
 const V = '2026-08-02';
 
@@ -24,7 +32,7 @@ export const TRAP_QUESTIONS: Question[] = [
   // --- naming traps: the label lies ---
   { id: 'tr1', cat: 'Trap', kind: 'trap', d: 4, q: 'Panama hats are traditionally made in which country?', o: ['Ecuador', 'Panama', 'Colombia', 'Peru'], a: 0, e: 'They are woven in Ecuador. The name stuck because they were shipped out through Panama.', c: 38, tags: ['naming'], verifiedAt: V },
   { id: 'tr2', cat: 'Trap', kind: 'trap', d: 4, q: 'Catgut string is traditionally made from which animal?', o: ['Sheep', 'Cats', 'Cattle', 'Goats'], a: 0, e: 'Catgut comes from sheep and sometimes horse intestines. It has never involved cats.', c: 36, tags: ['naming'], verifiedAt: V },
-  { id: 'tr3', cat: 'Trap', kind: 'trap', d: 4, q: 'A camel hair brush is usually made from the hair of what?', o: ['Squirrel', 'Camel', 'Goat', 'Horse'], a: 0, e: 'Camel hair brushes are typically squirrel hair, named after their supposed inventor.', c: 33, tags: ['naming'], verifiedAt: V },
+  { id: 'tr3', cat: 'Trap', kind: 'trap', d: 4, q: 'A camel hair brush is usually made from the hair of what?', o: ['Squirrel', 'Camel', 'Goat', 'Horse'], a: 0, e: 'Camel hair brushes are usually squirrel, sometimes goat or ox. They have never contained camel hair - it is too woolly to hold a point.', c: 33, tags: ['naming'], verifiedAt: V },
   { id: 'tr4', cat: 'Trap', kind: 'trap', d: 4, q: 'The Canary Islands take their name from which animal?', o: ['Dogs', 'Canaries', 'Goats', 'Seals'], a: 0, e: 'From the Latin "insula canaria", island of dogs. The bird was named after the islands, not the reverse.', c: 34, tags: ['naming'], verifiedAt: V },
   { id: 'tr5', cat: 'Trap', kind: 'trap', d: 4, q: 'Great Danes were originally developed in which country?', o: ['Germany', 'Denmark', 'Netherlands', 'Sweden'], a: 0, e: 'The breed was developed in Germany, where it is called the Deutsche Dogge.', c: 37, tags: ['naming'], verifiedAt: V },
   { id: 'tr6', cat: 'Trap', kind: 'trap', d: 4, q: 'Guinea pigs originally come from which part of the world?', o: ['South America', 'West Africa', 'Southeast Asia', 'Southern Europe'], a: 0, e: 'They were domesticated in the Andes. They are not from Guinea and are not pigs.', c: 40, tags: ['naming'], verifiedAt: V },
@@ -83,6 +91,5 @@ export const TRAP_QUESTIONS: Question[] = [
   { id: 'tr51', cat: 'Trap', kind: 'trap', d: 5, q: 'Averaged over time, which planet is closest to Earth?', o: ['Mercury', 'Venus', 'Mars', 'Jupiter'], a: 0, e: 'Venus gets closest at its nearest approach, but Mercury stays near the Sun and so spends more time close to us.', hook: 'By the same measure, Mercury is the closest planet to every other planet too.', c: 22, tags: ['framing'], verifiedAt: V },
   { id: 'tr52', cat: 'Trap', kind: 'trap', d: 4, q: 'What is the largest organ in the human body?', o: ['Skin', 'Liver', 'Brain', 'Lungs'], a: 0, e: 'Skin is an organ, and by both surface area and weight it is the biggest.', c: 43, tags: ['framing'], verifiedAt: V },
   { id: 'tr53', cat: 'Trap', kind: 'trap', d: 3, q: 'Which weighs more: a kilogram of steel or a kilogram of feathers?', o: ['Neither, they are equal', 'The steel', 'The feathers', 'Depends on volume'], a: 0, e: 'Same trap, different metal. A kilogram is a kilogram.', hook: 'The feathers take up about a hundred times more space, which is what fools the eye.', c: 52, tags: ['framing'], verifiedAt: V },
-  { id: 'tr54', cat: 'Trap', kind: 'trap', d: 5, q: 'Which is heavier: a tonne of bricks or a tonne of helium balloons?', o: ['The balloons, once weighed in air', 'The bricks', 'Neither, they are equal', 'The balloons always'], a: 0, e: 'Buoyancy is the twist. To measure a tonne of helium on a scale in air you need far more actual mass than for bricks.', c: 20, tags: ['framing'], verifiedAt: V },
   { id: 'tr55', cat: 'Trap', kind: 'trap', d: 4, q: 'How many birthdays does the average person have?', o: ['One', 'About eighty', 'One per year', 'None'], a: 0, e: 'You are born once. Everything after that is an anniversary of it.', c: 41, tags: ['wording'], verifiedAt: V },
 ];

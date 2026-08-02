@@ -339,11 +339,14 @@ export function validateQuestionBank(
     }
   });
 
-  // Standing verification debt, reported rather than enforced.
-  const unverified = questions.filter((q) => !q.verifiedAt).length;
-  if (unverified > 0) {
-    push('info', 'unverified-debt', 'bank', `${unverified} of ${questions.length} questions have never been individually fact-checked.`);
-  }
+  // Every question in the bank has now been through content review, so an
+  // entry without a check date is a NEW one that skipped it. This was an info
+  // line while there was a backlog; now that the backlog is cleared it is an
+  // error, so the bank cannot quietly drift back to unverified content.
+  const unverified = questions.filter((q) => !q.verifiedAt);
+  unverified.forEach((q) =>
+    push('error', 'unverified', q.id, 'No verifiedAt - every question must go through content review before shipping.'),
+  );
 
   // Topic spacing during selection only works on tagged questions, so coverage
   // is reported per kind - otherwise the feature silently does nothing for a
