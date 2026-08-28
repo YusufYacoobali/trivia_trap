@@ -19,14 +19,28 @@ export default function RevealSheet({ game }: { game: GameApi }) {
   const isC = s.selected === q.a;
 
   const pts = `${s.lastEarned > 0 ? '+' : ''}${s.lastEarned}`;
-  const title = isC ? 'CORRECT!' : s.confidence ? 'NOT QUITE' : 'WRONG';
+  const title = s.timedOut ? "TIME'S UP" : isC ? 'CORRECT!' : 'NOT QUITE';
   const cn = CONF.find((c) => c.l === s.confidence);
-  const confName = isC ? (cn ? `${cn.name} paid off` : '') : cn ? `${cn.name} - no points` : '';
+  const confName = s.timedOut
+    ? 'Ran out of time'
+    : isC
+      ? cn
+        ? `${cn.name} paid off`
+        : ''
+      : cn
+        ? cn.risk > 0
+          ? `${cn.name} cost you ${cn.risk}`
+          : `${cn.name} - no points`
+        : '';
 
   const lastQuestion = s.qIndex + 1 >= s.queue.length && !mode.rush && !mode.endless;
   const nextLabel = lastQuestion ? 'See Results' : mode.endless && s.lastWrong ? 'See Results' : 'Next Question';
 
-  const headColors: [string, string] = isC ? ['#22d07f', '#0fa066'] : ['#ff6b85', '#e8425f'];
+  const headColors: [string, string] = isC
+    ? ['#22d07f', '#0fa066']
+    : s.timedOut
+      ? ['#8f88a8', '#6b6584']
+      : ['#ff6b85', '#e8425f'];
 
   return (
     <Sheet zIndex={45} showHandle={false} style={styles.sheet}>
@@ -51,6 +65,13 @@ export default function RevealSheet({ game }: { game: GameApi }) {
               </Txt>
             </View>
           ) : null}
+          {s.lastSpeedBonus ? (
+            <View style={[styles.crowdChip, { backgroundColor: C.greenChip }]}>
+              <Txt w={600} style={{ fontSize: 13, color: C.green }}>
+                Quick answer +1
+              </Txt>
+            </View>
+          ) : null}
           {mode.crowd ? (
             <View
               style={[
@@ -71,9 +92,17 @@ export default function RevealSheet({ game }: { game: GameApi }) {
               i
             </Txt>
           </View>
-          <Txt w={500} style={styles.explainText}>
-            {q.e}
-          </Txt>
+          <View style={{ flex: 1 }}>
+            <Txt w={500} style={styles.explainText}>
+              {q.e}
+            </Txt>
+            {/* The extra beat that makes an answer worth remembering. */}
+            {q.hook ? (
+              <Txt w={500} style={styles.hookText}>
+                {q.hook}
+              </Txt>
+            ) : null}
+          </View>
         </View>
 
         {/* crowd stats */}
@@ -87,7 +116,7 @@ export default function RevealSheet({ game }: { game: GameApi }) {
             />
           </View>
           <Txt w={600} style={styles.statText}>
-            Only {q.c}% got this right
+            {q.c}% get this right
           </Txt>
         </View>
 
@@ -112,7 +141,8 @@ const styles = StyleSheet.create({
 
   explainBox: { backgroundColor: '#f7f4fc', borderRadius: 18, padding: 15, paddingHorizontal: 16, flexDirection: 'row', gap: 11, alignItems: 'flex-start' },
   iBadge: { width: 26, height: 26, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
-  explainText: { flex: 1, fontSize: 14.5, color: C.inkSoft, lineHeight: 20 },
+  explainText: { fontSize: 14.5, color: C.inkSoft, lineHeight: 20 },
+  hookText: { fontSize: 13.5, color: C.muted, lineHeight: 19, marginTop: 7, fontStyle: 'italic' },
 
   statsRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 13, paddingHorizontal: 2 },
   statTrack: { flex: 1, height: 9, backgroundColor: C.lineDeep, borderRadius: 6, overflow: 'hidden' },

@@ -1,12 +1,14 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import Card from '../components/Card';
 import Icon, { IconName } from '../components/Icon';
 import Raised from '../components/Raised';
 import ScreenBackdrop from '../components/ScreenBackdrop';
 import Txt from '../components/Txt';
 import { FEATURED_MODE_IDS, MODES } from '../data/game';
 import { Mode } from '../data/types';
+import { todayKey } from '../game/storage';
 import { GameApi } from '../game/useGame';
 import { C } from '../theme';
 
@@ -49,10 +51,12 @@ function ModeCard({ mode, onPress }: { mode: Mode; onPress: () => void }) {
 }
 
 export default function HomeScreen({ game }: { game: GameApi }) {
-  const { state, selectMode, goProfile } = game;
+  const { state, selectMode, goProfile, goShop } = game;
   const coins = state.P.coins;
   const dailyMode = MODES.daily;
   const hardMode = MODES.hard;
+  const streak = state.P.dayStreak;
+  const dailyDone = state.P.dailyDate === todayKey();
 
   return (
     <ScreenBackdrop>
@@ -68,12 +72,20 @@ export default function HomeScreen({ game }: { game: GameApi }) {
           </Txt>
         </Txt>
         <View style={styles.headerRight}>
-          <View style={styles.coinPill}>
+          {streak > 0 ? (
+            <View style={styles.streakPill}>
+              <Txt w={600} style={styles.streakText}>
+                🔥 {streak}
+              </Txt>
+            </View>
+          ) : null}
+          {/* Coins now have somewhere to go, so the balance is a button. */}
+          <Card onPress={goShop} radius={14} depth={4} shadowColor="#ffd9ae" borderColor="#ffe2c2" style={styles.coinPill}>
             <View style={styles.coin} />
             <Txt w={600} style={styles.coinText}>
               {coins}
             </Txt>
-          </View>
+          </Card>
           <Raised onPress={goProfile} radius={14} depth={4} shadowColor="#d63659" gradient={['#ff7a93', '#ff4d6d']} style={styles.avatar}>
             <Txt w={700} style={styles.avatarText}>
               Y
@@ -103,7 +115,7 @@ export default function HomeScreen({ game }: { game: GameApi }) {
           Daily 10
         </Txt>
         <Txt w={500} style={styles.heroSub}>
-          10 mixed questions - keep your streak alive
+          {dailyDone ? 'Done today - share your result or replay' : '10 mixed questions - keep your streak alive'}
         </Txt>
         <View style={styles.heroRow}>
           <View style={styles.playBtn}>
@@ -172,14 +184,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: '#ffe2c2',
     paddingVertical: 6,
     paddingLeft: 8,
     paddingRight: 11,
+  },
+  streakPill: {
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: '#ffd9c2',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderRadius: 14,
   },
+  streakText: { fontSize: 14, color: '#e8620b' },
   coin: { width: 18, height: 18, borderRadius: 9, backgroundColor: '#ffc23d' },
   coinText: { color: C.coinText, fontSize: 14 },
   avatar: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },

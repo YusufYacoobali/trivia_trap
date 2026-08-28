@@ -19,6 +19,7 @@ import QuestionCountScreen from './src/screens/QuestionCountScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import QuestionScreen from './src/screens/QuestionScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import ShopScreen from './src/screens/ShopScreen';
 import SummaryScreen from './src/screens/SummaryScreen';
 import { C } from './src/theme';
 
@@ -43,7 +44,7 @@ export default function App() {
   const showNav = screen === 'home' || screen === 'profile' || screen === 'settings';
   const immersive = screen === 'summary' || screen === 'question';
   const bg = screen === 'summary' ? '#ffe1ec' : C.appBg;
-  const showCandyBackdrop = screen === 'home' || screen === 'category' || screen === 'questionCount';
+  const showCandyBackdrop = screen === 'home' || screen === 'category' || screen === 'questionCount' || screen === 'shop';
 
   return (
     <SafeAreaProvider>
@@ -64,6 +65,7 @@ export default function App() {
             {screen === 'summary' && <SummaryScreen game={game} />}
             {screen === 'profile' && <ProfileScreen game={game} />}
             {screen === 'settings' && <SettingsScreen game={game} />}
+            {screen === 'shop' && <ShopScreen game={game} />}
           </View>
           {showNav && !immersive ? (
             <BottomNav

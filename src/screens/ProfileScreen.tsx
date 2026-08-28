@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Raised from '../components/Raised';
 import Txt from '../components/Txt';
-import { BADGES } from '../data/game';
+import { BADGES, CATMETA, CATS } from '../data/game';
+import { tierLabel } from '../game/logic';
 import { GameApi } from '../game/useGame';
 import { C } from '../theme';
 
@@ -15,16 +16,15 @@ export default function ProfileScreen({ game }: { game: GameApi }) {
   const level = Math.max(1, Math.floor(P.totalScore / 200) + 1);
   const lifetimeAcc = `${P.answered ? Math.round((P.right / P.answered) * 100) : 0}%`;
 
-  const lb = [
-    { n: 'QuizWhiz', s: 9820 },
-    { n: 'BrainBolt', s: 7430 },
-    { n: 'TrapKing', s: 6210 },
-    { n: 'You', s: P.totalScore, me: true },
-    { n: 'Lucky7', s: 1980 },
-    { n: 'Owlbert', s: 1240 },
-  ].sort((a, b) => b.s - a.s);
-
-  const rankColors = ['#ffb703', '#c2bcd3', '#d6975a'];
+  // The old "Daily Leaderboard" was six hardcoded names with invented scores.
+  // A player who works that out stops trusting every other number on the
+  // screen, so it is gone until there is a backend to make it real. What
+  // replaces it is honest and actually actionable: where the player is
+  // strongest and weakest, from their own answers.
+  const strengths = CATS.filter((cat) => cat !== 'All')
+    .map((cat) => ({ cat, skill: P.skill[cat] }))
+    .filter((row): row is { cat: string; skill: number } => typeof row.skill === 'number')
+    .sort((a, b) => b.skill - a.skill);
 
   const stats: {
     value: string;
@@ -128,37 +128,37 @@ export default function ProfileScreen({ game }: { game: GameApi }) {
       </View>
 
       <Txt w={700} style={styles.section}>
-        Daily Leaderboard
+        Your Categories
       </Txt>
       <Raised radius={22} depth={5} shadowColor={C.lineDeep} faceColor="#fff" style={[styles.lbCard, { borderWidth: 2, borderColor: C.line }]}>
-        {lb.map((row, i) => (
-          <View
-            key={row.n}
-            style={[
-              styles.lbRow,
-              i < lb.length - 1 && !row.me ? { borderBottomWidth: 1.5, borderBottomColor: C.line } : null,
-              row.me ? { backgroundColor: '#fff0f3', borderRadius: 14 } : null,
-            ]}
-          >
+        {strengths.length === 0 ? (
+          <Txt w={500} style={styles.empty}>
+            Play a few rounds and this fills in with the difficulty each category is serving you.
+          </Txt>
+        ) : (
+          strengths.map((row, i) => (
             <View
-              style={[
-                styles.rank,
-                { backgroundColor: i < 3 ? rankColors[i] : C.line },
-              ]}
+              key={row.cat}
+              style={[styles.lbRow, i < strengths.length - 1 ? { borderBottomWidth: 1.5, borderBottomColor: C.line } : null]}
             >
-              <Txt w={700} style={{ fontSize: 14, color: i < 3 ? '#fff' : C.muted }}>
-                {i + 1}
+              <View style={[styles.rank, { backgroundColor: CATMETA[row.cat]?.sh ?? C.line }]}>
+                <Txt w={700} style={{ fontSize: 13, color: '#fff' }}>
+                  {row.skill.toFixed(1)}
+                </Txt>
+              </View>
+              <Txt w={600} style={styles.lbName}>
+                {row.cat}
+              </Txt>
+              <Txt w={700} style={{ fontSize: 14, color: C.muted }}>
+                {tierLabel(row.skill)}
               </Txt>
             </View>
-            <Txt w={600} style={styles.lbName}>
-              {row.n}
-            </Txt>
-            <Txt w={700} style={{ fontSize: 15, color: row.me ? C.pink : C.ink }}>
-              {row.s.toLocaleString()}
-            </Txt>
-          </View>
-        ))}
+          ))
+        )}
       </Raised>
+      <Txt w={500} style={styles.footnote}>
+        Questions are matched to these ratings, so each category stays about as hard as you can handle.
+      </Txt>
       </ScrollView>
     </View>
   );
@@ -187,5 +187,7 @@ const styles = StyleSheet.create({
   lbCard: { padding: 8 },
   lbRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 13, paddingHorizontal: 12 },
   rank: { width: 28, height: 28, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
+  empty: { fontSize: 13.5, color: C.muted, lineHeight: 19, padding: 4 },
+  footnote: { fontSize: 12.5, color: C.mutedSoft, lineHeight: 17, marginTop: 10, paddingHorizontal: 4 },
   lbName: { flex: 1, fontSize: 15, color: C.ink },
 });
